@@ -348,3 +348,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/MusicCollectionListVsCodeDELETE/.vscode
+/All-Files-Music_Loss.txt
+/MusicCollectionList/Resources/Collection_MP3-Old.accdb
+/MusicCollectionList/Resources/Collection_MP3.accdb
+/MusicCollectionList/Resources/Collection_MP3.laccdb
+/MusicCollectionListVsCodeDELETE
