@@ -2,6 +2,7 @@
 using System;
 using System.Text;
 using System.IO;
+using MusicCollectionList;
 
 namespace MusicCollection
 {
@@ -9,58 +10,68 @@ namespace MusicCollection
 
     internal class FilesTransformer
     {
-        private StreamReader fileIn;
-        private StreamWriter fileOut;
-        private int count = 0;
+        private StreamReader _streamReader;
+        private StreamWriter _streamWriter;
+        private int _count = 0;
 
         /// <summary>
-        /// File transform text to text -> path and add extention 
-        /// input -text file with result of "Dir *.* /s>ll-Files-music.txt
+        /// File transform text to csv 
+        /// input  - text file with result of "PowerShellHelper" class
+        /// input  - text file with result of "MsDosShellHelper" class
+        ///
         /// output - text file with format: fullPathFile;extention
         /// </summary>
-        /// <param name="Collection"></param>
-        public void TextxToCSV(CollectionOriginType collectionOriginType)
+        /// <param name="collectionOriginType"></param>
+        /// 
+        public void TextToCSV(CollectionOriginType collectionOriginType, bool onlyMusicFiles)
         {
-            string fileNameIn;
-            string fileNameOut;
-            string prefix;
+            string rootFolder;
+            string fullFileNameIn;
+            string fullFileNameOut;
 
             if (collectionOriginType == CollectionOriginType.Loss)
             {
-                prefix = Constants.FolderRootCollectionLoss;
-                fileNameIn = Constants.FileTextNameCollectionLoss;
-                fileNameOut = Constants.FileCsvNameCollectionLoss;
+                rootFolder = Constants.FolderRootCollectionLoss;
+                fullFileNameIn = Path.Join(rootFolder, Constants.FileTextNameCollectionLoss);
+                fullFileNameOut = Path.Join(rootFolder, Constants.FileCsvNameCollectionLoss);
             }
             else
             {
-                prefix = Constants.FolderRootCollectionLossLess;
-                fileNameIn = Constants.FileTextNameCollectionLossLess;
-                fileNameOut = Constants.FileCsvNameCollectionLossLess;
+                rootFolder = Constants.FolderRootCollectionLossLess;
+                fullFileNameIn = Path.Join(rootFolder, Constants.FileTextNameCollectionLossLess);
+                fullFileNameOut = Path.Join(rootFolder, Constants.FileCsvNameCollectionLossLess);
             }
 
             try
             {
-                string fullFileNameIn = Path.Join(prefix, fileNameIn);
-                string fullFileNameOut = Path.Join(prefix, fileNameOut);
-
                 if (!File.Exists(fullFileNameIn))
                     throw new Exception($"File not found: '{fullFileNameIn}'");
 
-                fileIn = new StreamReader(fullFileNameIn, Encoding.UTF8);
-                fileOut = new StreamWriter(fullFileNameOut, false, Encoding.UTF8);
+                _streamReader = new StreamReader(fullFileNameIn, Encoding.UTF8);
+                _streamWriter = new StreamWriter(fullFileNameOut, false, Encoding.UTF8);
 
                 string line;
-
-                while ((line = fileIn.ReadLine()) != null)
+                bool isValidFile = true;
+                while ((line = _streamReader.ReadLine()) != null)
                 {
-                    string extension = Path.GetExtension(line).Trim();
+                    //add extion column
+                    string extension = Path.GetExtension(line).Trim().ToUpper();
 
-                    fileOut.WriteLine(prefix + line + ";"  + extension);
-                    fileOut.Flush();
+                    if (extension.Length > 0)
+                        extension = extension.Substring(1);
 
-                    count++;
-                    Console.WriteLine(count);
+                    if (onlyMusicFiles)
+                        isValidFile = Enum.IsDefined(typeof(MusicFileExtension), extension);
+
+                    if (isValidFile)
+                    {
+                        _streamWriter.WriteLine(rootFolder + line + ";" + extension);
+                        _streamWriter.Flush();
+                        _count++;
+                    }
                 }
+
+                Console.WriteLine(_count);
             }
 
             catch (Exception exp)
@@ -69,11 +80,10 @@ namespace MusicCollection
             }
             finally
             {
-                fileIn.Close();
-                fileOut.Close();
+                _streamReader.Close();
+                _streamWriter.Close();
             }
 
         }
-
     }
 }

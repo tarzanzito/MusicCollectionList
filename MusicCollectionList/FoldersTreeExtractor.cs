@@ -37,7 +37,7 @@ namespace MusicCollection
         /// <param name="collection"></param>
         public void Process(CollectionOriginType collectionOriginType)
         {
-            string rootDirectory;
+            string rootFolder;
             string fileNameArtists;
             string fileNameAlbuns;
             string fileNameTracks;
@@ -45,14 +45,14 @@ namespace MusicCollection
 
             if (collectionOriginType == CollectionOriginType.Loss)
             {
-                rootDirectory = Constants.FolderRootCollectionLoss;
+                rootFolder = Constants.FolderRootCollectionLoss;
                 fileNameArtists = Constants.FileNameArtistsLoss;
                 fileNameAlbuns = Constants.FileNameAlbunsLoss; 
                 fileNameTracks = Constants.fileNameTracksLoss; 
             }
             else
             {
-                rootDirectory = Constants.FolderRootCollectionLossLess;
+                rootFolder = Constants.FolderRootCollectionLossLess;
                 fileNameArtists = Constants.FileNameArtistsLossLess;
                 fileNameAlbuns = Constants.FileNameAlbunsLossLess; 
                 fileNameTracks = Constants.fileNameTracksLossLess; 
@@ -64,7 +64,7 @@ namespace MusicCollection
                 _fileAlbuns = new StreamWriter(fileNameAlbuns, false, Encoding.UTF8);
                 _fileTracks = new StreamWriter(fileNameTracks, false, Encoding.UTF8);
 
-                LoadSubDirectories(rootDirectory);
+                LoadSubDirectories(rootFolder);
             }
             catch (Exception ex)
             {
@@ -78,10 +78,10 @@ namespace MusicCollection
             }
         }
 
-        private void LoadSubDirectories(string rootDirectory)
+        private void LoadSubDirectories(string rootFolder)
         {
             // Get all subdirectories  
-            string[] subdirectoryEntries = Directory.GetDirectories(rootDirectory);
+            string[] subdirectoryEntries = Directory.GetDirectories(rootFolder);
             
             foreach (string subdirectory in subdirectoryEntries)
             {

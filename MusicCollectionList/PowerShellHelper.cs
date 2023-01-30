@@ -270,6 +270,13 @@ namespace MusicCollection
     //}
 }
 
+//Collection<PSObject> res;
+//using PowerShell powershell = PowerShell.Create();
+//powershell.AddScript("param($param1) $d = get-date; $s = 'test string value'; " + "$d; $s; $param1;");
+//powershell.AddParameter("param1", "parameter 1 value!");
+//res = powershell.Invoke();
+
+
 //To Learning.....
 //private Process GetProcessByName(string name)
 //{
