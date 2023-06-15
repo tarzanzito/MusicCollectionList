@@ -3,8 +3,8 @@ namespace MusicCollection
 {
     internal static class Constants
     {
-        //public const string FolderRootCollectionLoss = @"\\NAS-QNAP\music\_COLLECTION\";
-        public const string FolderRootCollectionLoss = @"\\NAS-QNAP\Temp\_arquivado2\";
+        //public const string FolderRootCollectionLoss = @"\\NAS-QNAP\Temp\_arquivado2\";
+        public const string FolderRootCollectionLoss = @"\\NAS-QNAP\music\_COLLECTION\";
         public const string FolderRootCollectionLossLess = @"\\NAS-QNAP\music_lossless\_COLLECTION\";
 
         public const string FilesFilterLoss = "*.MP3,*.WMA";
@@ -23,6 +23,8 @@ namespace MusicCollection
         public const string FileNameArtistsLossLess = "Artists_LossLess.txt";
         public const string FileNameAlbunsLossLess = "Albuns_LossLess.txt";
         public const string fileNameTracksLossLess = "Tracks_LossLess.txt";
+
+        public const char FieldSeparator = ';';
     }
 
     public enum MusicFileExtension

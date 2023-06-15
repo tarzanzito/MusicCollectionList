@@ -2,7 +2,6 @@
 using System;
 using System.Text;
 using System.IO;
-using MusicCollectionList;
 
 namespace MusicCollection
 {
@@ -15,15 +14,15 @@ namespace MusicCollection
         private int _count = 0;
 
         /// <summary>
-        /// File transform text to csv 
+        /// transform text file to csv file and add prefix 'absolute fullFolder' to line and columb extension
+        /// columns separated by 'fieldSeparator' char
+        /// 
         /// input  - text file with result of "PowerShellHelper" class
-        /// input  - text file with result of "MsDosShellHelper" class
-        ///
-        /// output - text file with format: fullPathFile;extention
+        /// output - csv file with format: fullPathFile;extention
         /// </summary>
         /// <param name="collectionOriginType"></param>
         /// 
-        public void TextToCSV(CollectionOriginType collectionOriginType, bool onlyMusicFiles)
+        public void FlatToCSV(CollectionOriginType collectionOriginType, bool onlyMusicFiles)
         {
             string rootFolder;
             string fullFileNameIn;
@@ -54,7 +53,7 @@ namespace MusicCollection
                 bool isValidFile = true;
                 while ((line = _streamReader.ReadLine()) != null)
                 {
-                    //add extion column
+                    //add extinson column
                     string extension = Path.GetExtension(line).Trim().ToUpper();
 
                     if (extension.Length > 0)
@@ -65,7 +64,8 @@ namespace MusicCollection
 
                     if (isValidFile)
                     {
-                        _streamWriter.WriteLine(rootFolder + line + ";" + extension);
+                        
+                        _streamWriter.WriteLine(rootFolder + line + Constants.FieldSeparator + extension);
                         _streamWriter.Flush();
                         _count++;
                     }

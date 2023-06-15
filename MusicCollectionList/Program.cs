@@ -4,7 +4,6 @@ using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 
 //dotnet add package Microsoft.PowerShell.SDK
 //dotnet add package Serilog.Sinks.File
@@ -28,21 +27,22 @@ namespace MusicCollection
             Log.Information("App Staring...");
 
             Startwatch();
-            var watch = new Stopwatch();
-            watch.Start();
 
-            //--------------------------------------------------
-            //1 - Extractor Files and Folder (CMD / DOS command)
-            //--------------------------------------------------
+            //==================================================================
+            //Action 1 - Extract tree folder/files and save result in text file
+            //==================================================================
+
+
+            //-------------------------------------------------------
+            //Option 1 - Extractor Files and Folder via (CMD / DOS command)
+            //-------------------------------------------------------
             MsDosShellHelper msDosShellHelper = new();
             //msDosShellHelper.Process(CollectionOriginType.Loss); //TOP 1 - BEST PERFORMANCE
 
 
-            //-------------------------------------------
-            //2- Extractor Files and Folder (PowerShell)
-            //-------------------------------------------
-
-            // via PowerShell extract treefolder/files and save result in text file
+            //-----------------------------------------------
+            //Option 2- Extractor Files and Folder via (PowerShell)
+            //-----------------------------------------------
             var powerShellHelper = new MusicCollection.PowerShellHelper();
 
             //V1 - using powershell pipeline
@@ -55,8 +55,9 @@ namespace MusicCollection
             //powerShellHelper.PowerShellRunScriptString(CollectionOriginType.Loss); //TOP 2 - BEST PERFORMANCE
 
 
-            //----------------------------------
-            //3- Extractor Files and Folder (C#)
+
+            //---------------------------------------------------------------------
+            //Option 3- Extractor Files and Folder via (C#) , Directory.GetDirectories, Directory.GetFiles
             //----------------------------------
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albuns and tracks
@@ -64,20 +65,25 @@ namespace MusicCollection
             //extractor.Process(CollectionOriginType.Loss);  //LOW PERFORMANCE
 
 
-            //------------------------------------------------
-            //4- Transform text from previous step to csv file
-            //format -> file ; extencion
+            //===================================================================
+            //Action 2 - Transform text file from previous step to csv file
+            //and add  prefix 'absolute fullFolder' to line and column extension
+            //columns separated by 'fieldSeparator' char
+            //output format: absolute fullFileName ; extencion
             //output can be upload to Access and make queries
-            //------------------------------------------------
-
-            //extract all folders and files
+            //===================================================================
 
             var filesTransformer = new MusicCollection.FilesTransformer();
-            filesTransformer.TextToCSV(CollectionOriginType.Loss, false);
+            //filesTransformer.FlatToCSV(CollectionOriginType.Loss, false);
 
-            watch.Stop();
-            Debug.WriteLine($"Elapsed: {watch.ElapsedMilliseconds}");
-            Console.WriteLine($"Elapsed: {watch.ElapsedMilliseconds}");
+
+            //////////////////////////////////////////
+            
+            Stopwatch();
+
+            Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
+            Console.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
+            Log.Warning($"Elapsed: {_watch.ElapsedMilliseconds}");
 
             Log.Information("Finished...");
 
