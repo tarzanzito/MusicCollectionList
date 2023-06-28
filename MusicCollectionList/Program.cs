@@ -33,36 +33,36 @@ namespace MusicCollection
             //==================================================================
 
 
-            //-------------------------------------------------------
+            //-------------------------------------------------------------
             //Option 1 - Extractor Files and Folder via (CMD / DOS command)
-            //-------------------------------------------------------
+            //-------------------------------------------------------------
             MsDosShellHelper msDosShellHelper = new();
-            //msDosShellHelper.Process(CollectionOriginType.Loss); //TOP 1 - BEST PERFORMANCE
+            //msDosShellHelper.TreeProcess(CollectionOriginType.Loss); //TOP 1 - BEST PERFORMANCE
 
 
-            //-----------------------------------------------
+            //-----------------------------------------------------
             //Option 2- Extractor Files and Folder via (PowerShell)
-            //-----------------------------------------------
-            var powerShellHelper = new MusicCollection.PowerShellHelper();
+            //-----------------------------------------------------
+            var powerShellHelper = new PowerShellHelper();
 
             //V1 - using powershell pipeline
-            ////powerShellHelper.PowerShellRunWithPipelne(CollectionOriginType.Loss);
+            ////powerShellHelper.TreeProcessUsingPipeline(CollectionOriginType.Loss);
 
             //V2 - using powershell string command
-            ////powerShellHelper.PowerShellRunCommand(CollectionOriginType.Loss);
+            ////powerShellHelper.TreeProcessUsingCommand(CollectionOriginType.Loss);
 
             //V3 -using powershell execute script
-            //powerShellHelper.PowerShellRunScriptString(CollectionOriginType.Loss); //TOP 2 - BEST PERFORMANCE
+            //powerShellHelper.TreeProcessUsingScriptString(CollectionOriginType.Loss); //TOP 2 - BEST PERFORMANCE
 
 
 
             //---------------------------------------------------------------------
             //Option 3- Extractor Files and Folder via (C#) , Directory.GetDirectories, Directory.GetFiles
-            //----------------------------------
+            //---------------------------------------------------------------------
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albuns and tracks
-            var extractor = new MusicCollection.FoldersTreeExtractor();
-            //extractor.Process(CollectionOriginType.Loss);  //LOW PERFORMANCE
+            var extractor = new SysemIOShellHelper();
+            //extractor.TreeProcess(CollectionOriginType.Loss);  //LOW PERFORMANCE
 
 
             //===================================================================
@@ -73,8 +73,8 @@ namespace MusicCollection
             //output can be upload to Access and make queries
             //===================================================================
 
-            var filesTransformer = new MusicCollection.FilesTransformer();
-            //filesTransformer.FlatToCSV(CollectionOriginType.Loss, false);
+            var filesTransformer = new FilesTransformer();
+            filesTransformer.FlatToCSV(CollectionOriginType.Loss, false);
 
 
             //////////////////////////////////////////

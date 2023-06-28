@@ -10,7 +10,7 @@ namespace MusicCollectionList
         private string _fullFileNameOut;
         private StreamWriter _streamWriter;
 
-    public void Process(CollectionOriginType collectionOriginType)
+    public void TreeProcess(CollectionOriginType collectionOriginType)
         {
             if (collectionOriginType == CollectionOriginType.Loss)
             {
@@ -33,7 +33,7 @@ namespace MusicCollectionList
             startInfo.FileName = "cmd.exe";
             startInfo.Arguments = $"/C chcp 65001 & dir /S /A:-D /B {_rootPath}";
             //  /S     - AllL sub-folders (tree)
-            //  /A:-D  - Get all except folders - /A:D only folders
+            //  /A:-D  - Get all except folders -- /A:D Get only folders
             //  /B     - linear output format
             //
             //@chcp 65001

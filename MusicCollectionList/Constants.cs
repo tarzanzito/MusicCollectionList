@@ -1,5 +1,5 @@
 ﻿
-namespace MusicCollection
+namespace MusicCollectionList
 {
     internal static class Constants
     {

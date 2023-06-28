@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace MusicCollection
+namespace MusicCollectionList
 {
     //Escreve 3 ficheiros
     //"1 - Artists_(FLAC/MP3).txt"
@@ -14,7 +14,7 @@ namespace MusicCollection
     //"3 - Tracks_(FLAC/MP3).txt";
     //  ficheiros com extensão MP3/
 
-    internal class FoldersTreeExtractor
+    internal class SysemIOShellHelper
     {
         private StreamWriter _fileArtists;
         private StreamWriter _fileAlbuns;
@@ -35,7 +35,7 @@ namespace MusicCollection
         /// output to tree text files, 'artists', 'albuns' and 'tracks'
         /// </summary>
         /// <param name="collection"></param>
-        public void Process(CollectionOriginType collectionOriginType)
+        public void TreeProcess(CollectionOriginType collectionOriginType)
         {
             string rootFolder;
             string fileNameArtists;

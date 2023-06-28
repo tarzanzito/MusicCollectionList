@@ -3,7 +3,7 @@ using System;
 using System.Text;
 using System.IO;
 
-namespace MusicCollection
+namespace MusicCollectionList
 {
     //dir \\NAS-QNAP\music_lossless\_COLLECTION\*.mp3 /s>d:\mp3.txt
 

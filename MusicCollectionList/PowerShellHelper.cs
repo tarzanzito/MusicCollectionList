@@ -18,7 +18,7 @@ using System.IO;
 //Read about wildcard characters caracteres curinga
 //https://support.microsoft.com/pt-br/office/exemplos-de-caracteres-curinga-939e153f-bd30-47e4-a763-61897c87b3f4
 //
-namespace MusicCollection
+namespace MusicCollectionList
 {
     //dir \\NAS-QNAP\music_lossless\_COLLECTION\*.mp3 /s>d:\mp3.txt
 
@@ -36,7 +36,7 @@ namespace MusicCollection
         //cria ficheiro texto com a arvore de directorios e ficheiros
 
         //1-utilizando pipeline - o comando seguinte PODE obter o resultado do comando anterior
-        public void PowerShellRunWithPipelne(CollectionOriginType collectionOriginType)
+        public void TreeProcessUsingPipeline(CollectionOriginType collectionOriginType)
         {
             PrepareVariables(collectionOriginType);
 
@@ -80,7 +80,7 @@ namespace MusicCollection
         }
 
         //2-utilizando comando
-        public void PowerShellRunCommand(CollectionOriginType collectionOriginType)
+        public void TreeProcessUsingCommand(CollectionOriginType collectionOriginType)
         {
             PrepareVariables(collectionOriginType);
 
@@ -123,7 +123,7 @@ namespace MusicCollection
         }
 
         //3-Utilizando script string
-        public void PowerShellRunScriptString(CollectionOriginType collectionOriginType)
+        public void TreeProcessUsingScriptString(CollectionOriginType collectionOriginType)
         {
             PrepareVariables(collectionOriginType);
 
@@ -197,6 +197,7 @@ namespace MusicCollection
 
             return res;
         }
+
 
         ////Passa uma string com script powershell -
         ////SEM filtro
