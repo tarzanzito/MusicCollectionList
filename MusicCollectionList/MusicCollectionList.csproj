@@ -6,7 +6,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <Title>MusicCollectionList</Title>
-    <StartupObject>MusicCollection.Program</StartupObject>
+    <StartupObject>MusicCollectionList.Program</StartupObject>
     <!--<ApplicationIcon>Resources\732.ico</ApplicationIcon>-->
 	<!--<PublishAot>True</PublishAot>-->
 	

@@ -4,6 +4,7 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Collections.ObjectModel;
 using System.IO;
+using static System.Net.WebRequestMethods;
 
 
 //ATENTION:
@@ -29,14 +30,13 @@ namespace MusicCollectionList
     {
         private string _rootPath;
         private string _fullFileNameOut;
-        private string _filter;
-        private string[] _filterArray;
-        private string _filterParameter;
+        private string _extensionFilter;
+        private string[] _extensionFilterArray;
 
         //cria ficheiro texto com a arvore de directorios e ficheiros
 
         //1-utilizando pipeline - o comando seguinte PODE obter o resultado do comando anterior
-        public void TreeProcessUsingPipeline(CollectionOriginType collectionOriginType)
+        public void TreeProcessUsingPipeline(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter)
         {
             PrepareVariables(collectionOriginType);
 
@@ -50,10 +50,17 @@ namespace MusicCollectionList
             Command command1 = new("Get-ChildItem");
             command1.Parameters.Add("LiteralPath", _rootPath);
 
-            if (_filterArray != null)
-                command1.Parameters.Add("Include", _filterArray);
-            else if (_filter.Length > 0)
-                command1.Parameters.Add("Filter", _filter);
+            ///Context, only: All, Directories, Files
+            if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
+                command1.Parameters.Add("Directory");
+            if (contextFilter == FileSystemContextFilter.FilesOnly)
+                command1.Parameters.Add("File");
+
+            //extensions filter
+            if (_extensionFilterArray != null)
+                command1.Parameters.Add("Include", _extensionFilterArray);
+            else if (_extensionFilter.Length > 0)
+                command1.Parameters.Add("Filter", _extensionFilter);
 
             command1.Parameters.Add("Recurse");
             command1.Parameters.Add("Name"); //output format
@@ -80,7 +87,7 @@ namespace MusicCollectionList
         }
 
         //2-utilizando comando
-        public void TreeProcessUsingCommand(CollectionOriginType collectionOriginType)
+        public void TreeProcessUsingCommand(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter)
         {
             PrepareVariables(collectionOriginType);
 
@@ -89,14 +96,20 @@ namespace MusicCollectionList
             ps.AddCommand("Get-ChildItem");
             ps.AddParameter("LiteralPath", _rootPath);
 
-            if (_filterArray != null)
-                ps.AddParameter("Include", _filterArray);
-            else if (_filter.Length > 0)
-                ps.AddParameter("Filter", _filter);
+            //Context, only: All, Directories, Files 
+            if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
+                ps.AddParameter("Directory");
+            if (contextFilter == FileSystemContextFilter.FilesOnly)
+                ps.AddParameter("File");
 
-            ps.AddParameter("-Recurse");
-            ps.AddParameter("-Name");
-            ps.AddParameter("-File");
+            //Extension filter
+            if (_extensionFilterArray != null)
+                ps.AddParameter("Include", _extensionFilterArray);
+            else if (_extensionFilter.Length > 0)
+                ps.AddParameter("Filter", _extensionFilter);
+
+            ps.AddParameter("Recurse");
+            ps.AddParameter("Name");
 
             System.Collections.ObjectModel.Collection<PSObject> results = ps.Invoke();
 
@@ -123,15 +136,23 @@ namespace MusicCollectionList
         }
 
         //3-Utilizando script string
-        public void TreeProcessUsingScriptString(CollectionOriginType collectionOriginType)
+        public void TreeProcessUsingScriptString(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter)
         {
             PrepareVariables(collectionOriginType);
+
+            //Context, only: All, Directories, Files 
+            string sysContext = "";
+            if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
+                sysContext = "-Directory";
+            if (contextFilter == FileSystemContextFilter.FilesOnly)
+                sysContext = "-File";
+
 
             //mount
             //"Get-ChildItem -LiteralPath 'C:\\Test' -Recurse -Name -File | Out-File 'c:\result.txt'";
             //"Get-ChildItem -LiteralPath 'C:\\Test' -Filter '*.jpg' -Recurse -Name -File | Out-File 'c:\result.txt'";
             //"Get-ChildItem -LiteralPath 'C:\\Test' -Include '*.jpg,*.mp3' -Recurse -Name -File | Out-File 'c:\result.txt'";
-            string script = $"Get-ChildItem -LiteralPath '{_rootPath}' {_filterParameter} -Recurse -Name -File | Out-File '{_fullFileNameOut}'";
+            string script = $"Get-ChildItem -LiteralPath '{_rootPath}' {_extensionFilter} -Recurse -Name {sysContext} | Out-File '{_fullFileNameOut}'";
 
             ///
 
@@ -151,28 +172,28 @@ namespace MusicCollectionList
             if (collectionOriginType == CollectionOriginType.Loss)
             {
                 _rootPath = Constants.FolderRootCollectionLoss;
-                _filter = FilterVerify(Constants.FilesFilterLoss);
+                _extensionFilter = FilterVerify(Constants.FilesFilterLoss);
                 _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLoss);
             }
             else
             {
                 _rootPath = Constants.FolderRootCollectionLossLess;
-                _filter = FilterVerify(Constants.FilesFilterLossLess);
+                _extensionFilter = FilterVerify(Constants.FilesFilterLossLess);
                 _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLossLess);
             }
 
-            bool isFilterArray = _filter.Contains(',');
-            bool hasFilter = _filter.Trim().Length > 0;
+            bool isFilterArray = _extensionFilter.Contains(',');
+            bool hasFilter = _extensionFilter.Trim().Length > 0;
 
-            _filterParameter = "";
-            _filterArray = null;
+            _extensionFilter = "";
+            _extensionFilterArray = null;
             if (isFilterArray)
             {
-                _filterArray = _filter.Split(",");
-                _filterParameter = $"-Include ({_filter})";
+                _extensionFilterArray = _extensionFilter.Split(",");
+                _extensionFilter = $"-Include ({_extensionFilter})";
             }
             else if (hasFilter)
-                _filterParameter = $"-Filter {_filter}";
+                _extensionFilter = $"-Filter {_extensionFilter}";
 
         }
 

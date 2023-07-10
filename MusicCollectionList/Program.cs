@@ -1,5 +1,4 @@
 ﻿
-using MusicCollectionList;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -14,7 +13,7 @@ using System.IO;
 //Install-Package Serilog.Sinks.Console
 //Install-Package Serilog.Sinks.File 
 
-namespace MusicCollection
+namespace MusicCollectionList
 {
     internal class Program
     {
@@ -24,9 +23,11 @@ namespace MusicCollection
         {
             StartLogger();
 
-            Log.Information("App Staring...");
+            Log.Information("App Started...");
 
             Startwatch();
+
+            CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
 
             //==================================================================
             //Action 1 - Extract tree folder/files and save result in text file
@@ -36,8 +37,9 @@ namespace MusicCollection
             //-------------------------------------------------------------
             //Option 1 - Extractor Files and Folder via (CMD / DOS command)
             //-------------------------------------------------------------
-            MsDosShellHelper msDosShellHelper = new();
-            //msDosShellHelper.TreeProcess(CollectionOriginType.Loss); //TOP 1 - BEST PERFORMANCE
+            MsDosShellHelper msDosShellHelper = new();  //TOP 1 - BEST HIGH PERFORMANCE
+            //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly);
+            //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
 
             //-----------------------------------------------------
@@ -45,15 +47,16 @@ namespace MusicCollection
             //-----------------------------------------------------
             var powerShellHelper = new PowerShellHelper();
 
+            //TOP 2 - BEST PERFORMANCE
+
             //V1 - using powershell pipeline
-            ////powerShellHelper.TreeProcessUsingPipeline(CollectionOriginType.Loss);
+            ////powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
             //V2 - using powershell string command
-            ////powerShellHelper.TreeProcessUsingCommand(CollectionOriginType.Loss);
+            ////powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
             //V3 -using powershell execute script
-            //powerShellHelper.TreeProcessUsingScriptString(CollectionOriginType.Loss); //TOP 2 - BEST PERFORMANCE
-
+            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
 
             //---------------------------------------------------------------------
@@ -61,8 +64,8 @@ namespace MusicCollection
             //---------------------------------------------------------------------
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albuns and tracks
-            var extractor = new SysemIOShellHelper();
-            //extractor.TreeProcess(CollectionOriginType.Loss);  //LOW PERFORMANCE
+            var extractor = new SystemIOShellHelper();
+            //extractor.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);  //LOW PERFORMANCE
 
 
             //===================================================================
@@ -73,12 +76,27 @@ namespace MusicCollection
             //output can be upload to Access and make queries
             //===================================================================
 
+            //---------------------------------------------------------------------
             var filesTransformer = new FilesTransformer();
-            filesTransformer.FlatToCSV(CollectionOriginType.Loss, false);
+            //filesTransformer.FlatToCSV(collectionOriginType);
+            //---------------------------------------------------------------------
 
+
+            //===================================================================
+            //Action 3 - Validate  text file from previous step to csv file
+            //and add  prefix 'absolute fullFolder' to line and column extension
+            //columns separated by 'fieldSeparator' char
+            //output format: absolute fullFileName ; extencion
+            //output can be upload to Access and make queries
+            //===================================================================
+
+            //---------------------------------------------------------------------
+            var validateCollection = new ValidateCollection();
+            validateCollection.ValidateSequencialFileWithTreeCollection(collectionOriginType);
+            //---------------------------------------------------------------------
 
             //////////////////////////////////////////
-            
+
             Stopwatch();
 
             Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
@@ -107,6 +125,7 @@ namespace MusicCollection
                .CreateLogger();
 
             Log.Information("Logger Started...");
+            Log.Information($"LogFile:{logFileFullName}");
         }
 
         private static void Startwatch()

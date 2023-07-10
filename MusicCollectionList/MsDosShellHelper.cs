@@ -1,4 +1,5 @@
-﻿using MusicCollection;
+﻿using Serilog;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -10,71 +11,101 @@ namespace MusicCollectionList
         private string _fullFileNameOut;
         private StreamWriter _streamWriter;
 
-    public void TreeProcess(CollectionOriginType collectionOriginType)
+    public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter)
         {
-            if (collectionOriginType == CollectionOriginType.Loss)
+            Log.Information("'MsDosShellHelper.TreeProcess' - Started...");
+
+            try
             {
-                _rootPath = Constants.FolderRootCollectionLoss;
-                _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLoss);
+                if (collectionOriginType == CollectionOriginType.Loss)
+                {
+                    _rootPath = Constants.FolderRootCollectionLoss;
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLoss);
+                }
+                else
+                {
+                    _rootPath = Constants.FolderRootCollectionLossLess;
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLossLess);
+                }
+
+                //ProcessStartInfo
+                _streamWriter = new StreamWriter(_fullFileNameOut);
+
+                //Process Info
+                System.Diagnostics.ProcessStartInfo startInfo = new();
+                //basic
+
+                //TODO: Extensions filter
+
+                startInfo.FileName = "cmd.exe";
+                switch (contextFilter)
+                {
+                    case FileSystemContextFilter.All:
+                        startInfo.Arguments = $"/C chcp 65001 & dir /S /B {_rootPath}";
+                        break;
+                    case FileSystemContextFilter.DirectoriesOnly:
+                        startInfo.Arguments = $"/C chcp 65001 & dir /S /A:D /B {_rootPath}";
+                        break;
+                    case FileSystemContextFilter.FilesOnly:
+                        startInfo.Arguments = $"/C chcp 65001 & dir /S /A:-D /B {_rootPath}";
+                        break;
+                }
+                //  /S     - All sub-folders (tree)
+                //  /A:-D  - Get all except folders -- /A:D Get only folders
+                //  /B     - linear output format
+                //
+                //@chcp 65001
+                //@dir /b /s \\NAS - QNAP\music\_COLLECTION\*.* >% 1
+
+
+                //dos without window
+                //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                //startInfo.UseShellExecute = false;
+                //startInfo.CreateNoWindow = false;
+
+                //output to files
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+
+                //Process
+                System.Diagnostics.Process process = new();
+                process.StartInfo = startInfo;
+
+                //V1
+                process.OutputDataReceived += OutputDataReceived;
+                process.ErrorDataReceived += ErrorDataReceived;
+
+                //V2
+                //process.OutputDataReceived += (sender, args) =>
+                //{
+                //    _streamWriter.WriteLine(args.Data);
+                //    _streamWriter.Flush();
+                //};
+
+                //process.OutputDataReceived += (sender, args) =>
+                //{
+                //    _streamWriter.WriteLine("ERROR:" + args.Data);
+                //    _streamWriter.Flush();
+                //};
+
+                //Start
+                process.Start();
+                process.BeginOutputReadLine(); //important to file output 
+                process.WaitForExit();
             }
-            else
+            catch (Exception ex)
             {
-                _rootPath = Constants.FolderRootCollectionLossLess;
-                _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLossLess);
+                Log.Error(ex.Message);
+                Log.Error(_fullFileNameOut);
+            }
+            finally
+            {
+                _streamWriter.Flush();
+                _streamWriter.Close();
+                _streamWriter.Dispose();
             }
 
-            //ProcessStartInfo
-            _streamWriter = new StreamWriter(_fullFileNameOut);
-
-            //Process Info
-            System.Diagnostics.ProcessStartInfo startInfo = new();
-            //basic
-            
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = $"/C chcp 65001 & dir /S /A:-D /B {_rootPath}";
-            //  /S     - AllL sub-folders (tree)
-            //  /A:-D  - Get all except folders -- /A:D Get only folders
-            //  /B     - linear output format
-            //
-            //@chcp 65001
-            //@dir /b /s \\NAS - QNAP\music\_COLLECTION\*.* >% 1
-
-            //dos without window
-            //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            //startInfo.UseShellExecute = false;
-            //startInfo.CreateNoWindow = false;
-   
-            //output to files
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-
-            //Process
-            System.Diagnostics.Process process = new();
-            process.StartInfo = startInfo;
-
-            //V1
-            process.OutputDataReceived += OutputDataReceived;
-            process.ErrorDataReceived += ErrorDataReceived;
-
-            //V2
-            //process.OutputDataReceived += (sender, args) =>
-            //{
-            //    _streamWriter.WriteLine(args.Data);
-            //    _streamWriter.Flush();
-            //};
-
-            //process.OutputDataReceived += (sender, args) =>
-            //{
-            //    _streamWriter.WriteLine("ERROR:" + args.Data);
-            //    _streamWriter.Flush();
-            //};
-
-            //Start
-            process.Start();
-            process.BeginOutputReadLine(); //important to file output 
-            process.WaitForExit();
-
-            _streamWriter.Close();
+            Log.Information("'MsDosShellHelper.TreeProcess' - Finished...");
         }
 
         private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
