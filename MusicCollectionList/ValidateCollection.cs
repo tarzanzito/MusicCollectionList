@@ -1,16 +1,11 @@
 ﻿using Serilog;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace MusicCollectionList
 {
-    internal class ValidateCollection
+    public class ValidateCollection
     {
         string _rootPath;
         string _fileNameIn;
@@ -71,13 +66,13 @@ namespace MusicCollectionList
             if (collectionOriginType == CollectionOriginType.Loss)
             {
                 _rootPath = Constants.FolderRootCollectionLoss;
-                _fileNameIn = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLoss);
+                _fileNameIn = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
                 _fileNameError = System.IO.Path.Join(_rootPath, Constants.FileErrorsLoss);
             }
             else
             {
                 _rootPath = Constants.FolderRootCollectionLossLess;
-                _fileNameIn = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLossLess);
+                _fileNameIn = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
                 _fileNameError = System.IO.Path.Join(_rootPath, Constants.FileErrorsLossLess);
             }
 

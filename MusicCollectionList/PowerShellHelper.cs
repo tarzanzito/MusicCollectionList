@@ -4,7 +4,6 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Collections.ObjectModel;
 using System.IO;
-using static System.Net.WebRequestMethods;
 
 
 //ATENTION:
@@ -26,7 +25,7 @@ namespace MusicCollectionList
     //Get-ChildItem -LiteralPath "\\NAS-QNAP\music\_COLLECTION" -Filter "*.mp3" -Recurse | Out-File "d:\mp3_p.txt"
     //Get-ChildItem -LiteralPath "\\NAS-QNAP\music\_COLLECTION" -Filter "*.mp3" -Recurse -Name | Out-File "d:\mp3_p.txt" 
 
-    internal class PowerShellHelper
+    public class PowerShellHelper
     {
         private string _rootPath;
         private string _fullFileNameOut;
@@ -172,14 +171,14 @@ namespace MusicCollectionList
             if (collectionOriginType == CollectionOriginType.Loss)
             {
                 _rootPath = Constants.FolderRootCollectionLoss;
-                _extensionFilter = FilterVerify(Constants.FilesFilterLoss);
-                _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLoss);
+                _extensionFilter = FilterVerify(Constants.FileExtensionsFilterLoss);
+                _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
             }
             else
             {
                 _rootPath = Constants.FolderRootCollectionLossLess;
-                _extensionFilter = FilterVerify(Constants.FilesFilterLossLess);
-                _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLossLess);
+                _extensionFilter = FilterVerify(Constants.FileExtensionsFilterLossLess);
+                _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
             }
 
             bool isFilterArray = _extensionFilter.Contains(',');

@@ -2,17 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MusicCollectionList
 {
-    internal class Actions
+    public class RenameFolders
     {
 
-        public void RenameFolders(CollectionOriginType collectionOriginType)
+        /// <summary>
+        /// rename folders terminated with [...] by ""
+        /// </summary>
+        /// <param name="collectionOriginType"></param>
+        public void RunIt(CollectionOriginType collectionOriginType)
         {
             string rootPath;
             string fileNameError;
@@ -75,12 +75,6 @@ namespace MusicCollectionList
             }
 
         }
-
-
-
-
-
-
     }
 }
 

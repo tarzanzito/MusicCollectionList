@@ -3,7 +3,7 @@ using Microsoft.PowerShell.Commands;
 
 namespace MusicCollectionList
 {
-    internal enum FileSystemContextFilter
+    public enum FileSystemContextFilter
     {
         DirectoriesOnly,
         FilesOnly,

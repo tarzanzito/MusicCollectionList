@@ -3,7 +3,7 @@ using Microsoft.PowerShell.Commands;
 
 namespace MusicCollectionList
 {
-    internal enum CollectionOriginType
+    public enum CollectionOriginType
     {
         Loss,
         Lossless

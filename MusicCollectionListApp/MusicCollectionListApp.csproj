@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+
+	  <DebugType>none</DebugType>
+	  <DebugSymbols>false</DebugSymbols>
+	  
+    <!--<Title>MusicCollectionListApp</Title>-->
+    <!--<StartupObject>MusicCollectionListApp.Program</StartupObject>-->
+    <!--<ApplicationIcon>Resources\732.ico</ApplicationIcon>-->
+	  
+	<!--<PublishAot>True</PublishAot>-->
+	<!--<RunAOTCompilation>true</RunAOTCompilation>-->  
+	<!--<PublishReadyToRun>true</PublishReadyToRun>-->
+	  
+	  <PublishSingleFile>true</PublishSingleFile>
+	  <SelfContained>true</SelfContained>
+	  <PublishTrimmed>true</PublishTrimmed>
+	  <InvariantGlobalization>true</InvariantGlobalization>
+	  <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	  <DebugType>none</DebugType>
+	  <DebugSymbols>false</DebugSymbols>
+
+	  <!--  <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
+  </PropertyGroup>
+	
+  <ItemGroup>
+	<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+	<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\732.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicCollectionList\MusicCollectionList.csproj" />
+  </ItemGroup>
+
+</Project>

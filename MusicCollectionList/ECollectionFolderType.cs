@@ -10,10 +10,7 @@ namespace MusicCollectionList
         Error,
         Artist,
         Album,
-        //ArtistIncorrect,
-        //AlbumIncorrect,
         MaybeArtistOrAlbum,
-        //DuplicateControlChar,
         IncorrectFormat
     }
 }

@@ -3,17 +3,19 @@ using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
+using MusicCollectionList;
 
+//via dotnet command
 //dotnet add package Microsoft.PowerShell.SDK
 //dotnet add package Serilog.Sinks.File
 //dotnet add package Serilog.Sinks.Console
 
-//powershell
+//via powershell
 //Install-Package Microsoft.PowerShell.SDK
 //Install-Package Serilog.Sinks.Console
 //Install-Package Serilog.Sinks.File 
 
-namespace MusicCollectionList
+namespace MusicCollectionListApp
 {
     internal class Program
     {
@@ -22,6 +24,10 @@ namespace MusicCollectionList
         public static int Main(string[] args)
         {
             StartLogger();
+           //Log.Debug
+           // Log.Error()
+            //Log.Fatal
+            //Log.Warning
 
             Log.Information("App Started...");
 
@@ -92,11 +98,13 @@ namespace MusicCollectionList
 
             //---------------------------------------------------------------------
             var validateCollection = new ValidateCollection();
-            validateCollection.ValidateSequencialFileWithTreeCollection(collectionOriginType);
+            //validateCollection.ValidateSequencialFileWithTreeCollection(collectionOriginType);
             //---------------------------------------------------------------------
 
             //////////////////////////////////////////
-
+            ///
+            var test = new Test();
+            test.RunIt();
             Stopwatch();
 
             Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");

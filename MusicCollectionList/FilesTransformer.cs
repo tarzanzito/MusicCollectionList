@@ -7,7 +7,7 @@ namespace MusicCollectionList
 {
     //dir \\NAS-QNAP\music_lossless\_COLLECTION\*.mp3 /s>d:\mp3.txt
 
-    internal class FilesTransformer
+    public class FilesTransformer
     {
         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
@@ -31,14 +31,14 @@ namespace MusicCollectionList
             if (collectionOriginType == CollectionOriginType.Loss)
             {
                 rootFolder = Constants.FolderRootCollectionLoss;
-                fullFileNameIn = Path.Join(rootFolder, Constants.FileTextNameCollectionLoss);
-                fullFileNameOut = Path.Join(rootFolder, Constants.FileCsvNameCollectionLoss);
+                fullFileNameIn = Path.Join(rootFolder, Constants.TreeTextFileNameCollectionLoss); 
+                fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLoss);
             }
             else
             {
                 rootFolder = Constants.FolderRootCollectionLossLess;
-                fullFileNameIn = Path.Join(rootFolder, Constants.FileTextNameCollectionLossLess);
-                fullFileNameOut = Path.Join(rootFolder, Constants.FileCsvNameCollectionLossLess);
+                fullFileNameIn = Path.Join(rootFolder, Constants.TreeTextFileNameCollectionLossLess);
+                fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLossLess);
             }
 
             try

@@ -14,7 +14,7 @@ namespace MusicCollectionList
     //"3 - Tracks_(FLAC/MP3).txt";
     //  ficheiros com extensão MP3/
 
-    internal class SystemIOShellHelper
+    public class SystemIOShellHelper
     {
         private StreamWriter _fileArtists;
         private StreamWriter _fileAlbuns;
@@ -32,7 +32,7 @@ namespace MusicCollectionList
         private int _count = 0;
 
         /// <summary>
-        /// get folder tree, analyse folder name (has {}, [], @)
+        /// get folder tree and analyse if folder name has "{}, [], @" tags
         /// output to tree text files, 'artists', 'albuns' and 'tracks'
         /// </summary>
         /// <param name="collection"></param>

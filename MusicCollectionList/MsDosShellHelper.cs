@@ -5,7 +5,7 @@ using System.IO;
 
 namespace MusicCollectionList
 {
-    internal class MsDosShellHelper
+    public class MsDosShellHelper
     {
         private string _rootPath;
         private string _fullFileNameOut;
@@ -20,12 +20,12 @@ namespace MusicCollectionList
                 if (collectionOriginType == CollectionOriginType.Loss)
                 {
                     _rootPath = Constants.FolderRootCollectionLoss;
-                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLoss);
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
                 }
                 else
                 {
                     _rootPath = Constants.FolderRootCollectionLossLess;
-                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.FileTextNameCollectionLossLess);
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
                 }
 
                 //ProcessStartInfo

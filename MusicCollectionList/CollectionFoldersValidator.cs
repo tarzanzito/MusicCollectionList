@@ -8,25 +8,16 @@ namespace MusicCollectionList
     {
         private string _data;
 
-        private const char COUNTRY_OPEN_TAG = '{';
-        private const char COUNTRY_CLOSE_TAG = '}';
-        private const char YEAR_OPEN_TAG = '{';
-        private const char YEAR_CLOSE_TAG = '}';
-        private const char ALBUM_OPEN_TAG = '[';
-        private const char ALBUM_CLOSE_TAG = ']';
-        private const char MEDIA_FORMAT_TAG = '@';
-        private const string MEDIA_FORMAT_TAG_LOSS = "MP3,128,192,160";
-        private const string MEDIA_FORMAT_TAG_LOSSLESS = "FLAC";
 
         private string MEDIA_FORMAT_TAGS;
 
         public CollectionFoldersValidator(CollectionOriginType collectionOriginType)
         {
             if (collectionOriginType == CollectionOriginType.Loss)
-                MEDIA_FORMAT_TAGS = MEDIA_FORMAT_TAG_LOSS;
+                MEDIA_FORMAT_TAGS = Constants.MEDIA_FORMAT_TAG_LOSS;
 
             if (collectionOriginType == CollectionOriginType.Lossless)
-                MEDIA_FORMAT_TAGS = MEDIA_FORMAT_TAG_LOSSLESS;
+                MEDIA_FORMAT_TAGS = Constants.MEDIA_FORMAT_TAG_LOSSLESS;
         }
 
         public CollectionFoldersValidatorResult ValidateFolder(string data)
@@ -80,29 +71,29 @@ namespace MusicCollectionList
 
         private CollectionFoldersValidatorResult FindForDuplicateControlChars()
         {
-            int count = CountCharOccurance(COUNTRY_OPEN_TAG);
+            int count = CountCharOccurance(Constants.COUNTRY_OPEN_TAG);
             if (count > 1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{COUNTRY_OPEN_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{Constants.COUNTRY_OPEN_TAG}' found");
 
-            count = CountCharOccurance(COUNTRY_CLOSE_TAG);
+            count = CountCharOccurance(Constants.COUNTRY_CLOSE_TAG);
             if (count > 1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{COUNTRY_CLOSE_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{Constants.COUNTRY_CLOSE_TAG}' found");
 
-            count = CountCharOccurance(YEAR_OPEN_TAG);
+            count = CountCharOccurance(Constants.YEAR_OPEN_TAG);
             if (count > 1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{YEAR_OPEN_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{Constants.YEAR_OPEN_TAG}' found");
 
-            count = CountCharOccurance(YEAR_CLOSE_TAG);
+            count = CountCharOccurance(Constants.YEAR_CLOSE_TAG);
             if (count > 1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{YEAR_CLOSE_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{Constants.YEAR_CLOSE_TAG}' found");
 
-            count = CountCharOccurance(ALBUM_OPEN_TAG);
+            count = CountCharOccurance(Constants.ALBUM_OPEN_TAG);
             if (count > 1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{ALBUM_OPEN_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{Constants.ALBUM_OPEN_TAG}' found");
 
-            count = CountCharOccurance(ALBUM_CLOSE_TAG);
+            count = CountCharOccurance(Constants.ALBUM_CLOSE_TAG);
             if (count > 1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{ALBUM_CLOSE_TAG} found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Duplicated '{Constants.ALBUM_CLOSE_TAG} found");
             
             return new CollectionFoldersValidatorResult(CollectionFolderType.Ok, "");
         }
@@ -137,15 +128,15 @@ namespace MusicCollectionList
 
         private CollectionFolderType GetCollectionFolderType()
         {
-            int posCO = _data.IndexOf(COUNTRY_OPEN_TAG);
-            int posCC = _data.IndexOf(COUNTRY_CLOSE_TAG);
+            int posCO = _data.IndexOf(Constants.COUNTRY_OPEN_TAG);
+            int posCC = _data.IndexOf(Constants.COUNTRY_CLOSE_TAG);
             
-            int posYO = _data.IndexOf(YEAR_OPEN_TAG);
-            int posYC = _data.IndexOf(YEAR_CLOSE_TAG);
+            int posYO = _data.IndexOf(Constants.YEAR_OPEN_TAG);
+            int posYC = _data.IndexOf(Constants.YEAR_CLOSE_TAG);
 
-            int posAO = _data.IndexOf(ALBUM_OPEN_TAG);
-            int posAC = _data.IndexOf(ALBUM_CLOSE_TAG);
-            int posMF = _data.IndexOf(MEDIA_FORMAT_TAG);
+            int posAO = _data.IndexOf(Constants.ALBUM_OPEN_TAG);
+            int posAC = _data.IndexOf(Constants.ALBUM_CLOSE_TAG);
+            int posMF = _data.IndexOf(Constants.MEDIA_FORMAT_TAG);
 
             bool maybeItIsArtistOrAlbum = (posCO > 0) || (posCC > 0) || (posYO > 0) || (posYC > 0) || (posAO > 0) || (posAC > 0) || (posMF > 0);
 
@@ -177,24 +168,24 @@ namespace MusicCollectionList
         private CollectionFoldersValidatorResult ValidateArtistFolderRules()
         {
             //required formats
-            string str = " " +  COUNTRY_OPEN_TAG;
+            string str = " " + Constants.COUNTRY_OPEN_TAG;
             int pos1 = _data.IndexOf(str);
             if (pos1 < 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: One space before '{COUNTRY_OPEN_TAG}' not found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: One space before '{Constants.COUNTRY_OPEN_TAG}' not found");
 
             //controls sequence
-            int pos2 = _data.IndexOf(COUNTRY_CLOSE_TAG);
+            int pos2 = _data.IndexOf(Constants.COUNTRY_CLOSE_TAG);
             if (pos2 < pos1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: '{COUNTRY_CLOSE_TAG}' before '{COUNTRY_OPEN_TAG}'");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: '{Constants.COUNTRY_CLOSE_TAG}' before '{Constants.COUNTRY_OPEN_TAG}'");
 
             //invalid formats
-            str = COUNTRY_OPEN_TAG + " ";
+            str = Constants.COUNTRY_OPEN_TAG + " ";
             pos1 = _data.IndexOf(str);
             if (pos1 > 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: One space after '{COUNTRY_OPEN_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: One space after '{Constants.COUNTRY_OPEN_TAG}' found");
 
             //contents
-            char[] chrs = { COUNTRY_OPEN_TAG, COUNTRY_CLOSE_TAG };
+            char[] chrs = { Constants.COUNTRY_OPEN_TAG, Constants.COUNTRY_CLOSE_TAG };
             string[] words = _data.Split(chrs);
 
             if (words[0].Trim() == "")
@@ -210,67 +201,67 @@ namespace MusicCollectionList
         private CollectionFoldersValidatorResult ValidateAlbumFolderRules()
         {
             //required formats
-            string str = " " + YEAR_OPEN_TAG;
+            string str = " " + Constants.YEAR_OPEN_TAG;
             int pos1 = _data.IndexOf(str);
             if (pos1 < 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{YEAR_OPEN_TAG}' not found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{Constants.YEAR_OPEN_TAG}' not found");
 
-            str = YEAR_CLOSE_TAG + " ";
+            str = Constants.YEAR_CLOSE_TAG + " ";
             int pos2 = _data.IndexOf(str);
             if (pos2 < 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{YEAR_CLOSE_TAG}' not found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{Constants.YEAR_CLOSE_TAG}' not found");
 
-            str = " " + ALBUM_OPEN_TAG;
+            str = " " + Constants.ALBUM_OPEN_TAG;
             int pos3 = _data.IndexOf(str);
             if (pos3 < 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{ALBUM_OPEN_TAG}' not found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{Constants.ALBUM_OPEN_TAG}' not found");
 
-            str = ALBUM_CLOSE_TAG + " ";
+            str = Constants.ALBUM_CLOSE_TAG + " ";
             int pos4 = _data.IndexOf(str);
             if (pos4 < 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{ALBUM_CLOSE_TAG}' not found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{Constants.ALBUM_CLOSE_TAG}' not found");
 
-            str = " " + MEDIA_FORMAT_TAG;
+            str = " " + Constants.MEDIA_FORMAT_TAG;
             int pos5 = _data.LastIndexOf(str);
             if (pos5 < 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{MEDIA_FORMAT_TAG}' not found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{Constants.MEDIA_FORMAT_TAG}' not found");
 
 
             // conctrols sequences
 
             if (pos2 < pos1)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{YEAR_CLOSE_TAG}' before '{YEAR_OPEN_TAG}'");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{Constants.YEAR_CLOSE_TAG}' before '{Constants.YEAR_OPEN_TAG}'");
 
             if (pos4 < pos3)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{ALBUM_CLOSE_TAG}' before '{ALBUM_OPEN_TAG}'");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{Constants.ALBUM_CLOSE_TAG}' before '{Constants.ALBUM_OPEN_TAG}'");
 
             if (pos5 < pos4)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{MEDIA_FORMAT_TAG}' before '{ALBUM_CLOSE_TAG}'");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{Constants.MEDIA_FORMAT_TAG}' before '{Constants.ALBUM_CLOSE_TAG}'");
 
             if (pos3 < pos2)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{ALBUM_OPEN_TAG}' before '{YEAR_CLOSE_TAG}'");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: '{Constants.ALBUM_OPEN_TAG}' before '{Constants.YEAR_CLOSE_TAG}'");
 
             //invalid formats
 
-            str = YEAR_OPEN_TAG + " ";
+            str = Constants.YEAR_OPEN_TAG + " ";
             pos1 = _data.IndexOf(str);
             if (pos1 > 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{YEAR_OPEN_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{Constants.YEAR_OPEN_TAG}' found");
 
-            str = " " + YEAR_CLOSE_TAG;
+            str = " " + Constants.YEAR_CLOSE_TAG;
             pos1 = _data.IndexOf(str);
             if (pos1 > 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{YEAR_CLOSE_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{Constants.YEAR_CLOSE_TAG}' found");
 
-            str = ALBUM_OPEN_TAG + " ";
+            str = Constants.ALBUM_OPEN_TAG + " ";
             pos1 = _data.IndexOf(str);
             if (pos1 > 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{ALBUM_OPEN_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space after '{Constants.ALBUM_OPEN_TAG}' found");
 
-            str = " " + ALBUM_CLOSE_TAG;
+            str = " " + Constants.ALBUM_CLOSE_TAG;
             pos1 = _data.IndexOf(str);
             if (pos1 > 0)
-                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{ALBUM_CLOSE_TAG}' found");
+                return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Album: One space before '{Constants.ALBUM_CLOSE_TAG}' found");
 
             //str =  MEDIA_FORMAT_TAG + " ";
             //pos1 = _data.LastIndexOf(str);
@@ -280,7 +271,7 @@ namespace MusicCollectionList
 
             //contents
 
-            char[] chrs = { YEAR_OPEN_TAG, YEAR_CLOSE_TAG, ALBUM_OPEN_TAG, ALBUM_CLOSE_TAG };
+            char[] chrs = { Constants.YEAR_OPEN_TAG, Constants.YEAR_CLOSE_TAG, Constants.ALBUM_OPEN_TAG, Constants.ALBUM_CLOSE_TAG };
             string[] words = _data.Split(chrs);
 
             if (words.Length != 5)
@@ -299,7 +290,7 @@ namespace MusicCollectionList
             if (temp.Length < 2)
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, "Album: @File media type is empty");
 
-            if (temp.Substring(0, 1) != MEDIA_FORMAT_TAG.ToString())
+            if (temp.Substring(0, 1) != Constants.MEDIA_FORMAT_TAG.ToString())
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, "Album: @File media type is empty");
 
             if (temp.Contains(" "))
