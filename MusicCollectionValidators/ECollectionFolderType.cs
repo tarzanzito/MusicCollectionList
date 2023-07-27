@@ -1,7 +1,6 @@
 ﻿
-using Microsoft.PowerShell.Commands;
 
-namespace MusicCollectionList
+namespace MusicCollectionValidators
 {
     internal enum CollectionFolderType
     {

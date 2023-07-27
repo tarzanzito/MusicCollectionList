@@ -1,9 +1,9 @@
 ﻿
 using System;
-using System.Text;
 using System.IO;
+using MusicCollectionContext;
 
-namespace MusicCollectionList
+namespace MusicCollectionActions
 {
     //dir \\NAS-QNAP\music_lossless\_COLLECTION\*.mp3 /s>d:\mp3.txt
 
@@ -46,8 +46,8 @@ namespace MusicCollectionList
                 if (!File.Exists(fullFileNameIn))
                     throw new Exception($"File not found: '{fullFileNameIn}'");
 
-                _streamReader = new StreamReader(fullFileNameIn, Encoding.UTF8);
-                _streamWriter = new StreamWriter(fullFileNameOut, false, Encoding.UTF8);
+                _streamReader = new StreamReader(fullFileNameIn, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(fullFileNameOut, false, Constants.StreamsEncoding);
 
                 string line;
                 bool isValidFile = true;

@@ -1,7 +1,9 @@
-﻿using Serilog;
+﻿using MusicCollectionContext;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
 
 namespace MusicCollectionList
 {
@@ -35,12 +37,12 @@ namespace MusicCollectionList
 
             StreamReader reader = null;
             int count = 0;
+            string line = "";
 
             try
             {
-                reader = new StreamReader(fileNameError);
+                reader = new StreamReader(fileNameError, Constants.StreamsEncoding);
 
-                string line;
                 int pos;
                 while ((line = reader.ReadLine()) != null)
                 {
@@ -64,6 +66,8 @@ namespace MusicCollectionList
             }
             catch (Exception ex)
             {
+                Log.Error($"Folder:[{line}] -Error:[{ex.Message}");
+
             }
             finally
             {

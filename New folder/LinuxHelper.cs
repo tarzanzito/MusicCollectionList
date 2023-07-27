@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -11,22 +11,16 @@ namespace MusicCollectionList
         private string _fullFileNameOut;
         private StreamWriter _streamWriter;
 
-    public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter)
+    public void TreeProcess()
         {
             Log.Information("'MsDosShellHelper.TreeProcess' - Started...");
 
             try
             {
-                if (collectionOriginType == CollectionOriginType.Loss)
-                {
-                    _rootPath = Constants.FolderRootCollectionLoss;
-                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
-                }
-                else
-                {
-                    _rootPath = Constants.FolderRootCollectionLossLess;
-                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
-                }
+                    _rootPath = ".";
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, "xpto.txt");
+
+                    Log.Information($"Output=[{_fullFileNameOut}");
 
                 //ProcessStartInfo
                 _streamWriter = new StreamWriter(_fullFileNameOut);
@@ -37,19 +31,14 @@ namespace MusicCollectionList
 
                 //TODO: Extensions filter
 
-                startInfo.FileName = "cmd.exe";
-                switch (contextFilter)
-                {
-                    case FileSystemContextFilter.All:
-                        startInfo.Arguments = $"/C chcp 65001 & dir /S /B {_rootPath}";
-                        break;
-                    case FileSystemContextFilter.DirectoriesOnly:
-                        startInfo.Arguments = $"/C chcp 65001 & dir /S /A:D /B {_rootPath}";
-                        break;
-                    case FileSystemContextFilter.FilesOnly:
-                        startInfo.Arguments = $"/C chcp 65001 & dir /S /A:-D /B {_rootPath}";
-                        break;
-                }
+                startInfo.FileName = "/bin/bash";
+               
+// ls -d  only folders
+
+
+                //xpto1 startInfo.Arguments = $"-c \"ls -lha -R\"";
+                startInfo.Arguments = $"-c \"ls -a -R -p\"";
+                
                 //  /S     - All sub-folders (tree)
                 //  /A:-D  - Get all except folders -- /A:D Get only folders
                 //  /B     - linear output format
@@ -89,6 +78,7 @@ namespace MusicCollectionList
                 //};
 
                 //Start
+                Log.Information("'START !!!!!!!!!!!!!!!!!!!!!!");
                 process.Start();
                 process.BeginOutputReadLine(); //important to file output 
                 process.WaitForExit();
@@ -121,3 +111,4 @@ namespace MusicCollectionList
         }
     }
 }
+

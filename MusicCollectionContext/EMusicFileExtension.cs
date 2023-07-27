@@ -1,5 +1,5 @@
 ﻿
-namespace MusicCollectionList
+namespace MusicCollectionContext
 {
     public enum MusicFileExtension
     {

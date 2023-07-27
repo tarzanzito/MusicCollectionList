@@ -2,7 +2,7 @@
 using System.Text;
 
 
-namespace MusicCollectionList
+namespace MusicCollectionContext
 {
     internal class DiacriticsUtil
     {

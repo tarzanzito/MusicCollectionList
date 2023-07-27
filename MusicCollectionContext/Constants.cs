@@ -1,11 +1,16 @@
 ﻿
-namespace MusicCollectionList
+
+namespace MusicCollectionContext
 {
-    internal static class Constants
+    public class Constants
     {
-        //public const string FolderRootCollectionLoss = @"\\NAS-QNAP\Temp\_arquivado2\";
-        public const string FolderRootCollectionLoss = @"\\NAS-QNAP\music\_COLLECTION\";
+        public static readonly System.Text.Encoding StreamsEncoding = System.Text.Encoding.UTF8;
+
+        //public const string FolderRootCollectionLoss = @"\\NAS-QNAP\music\_COLLECTION\";
+        public const string FolderRootCollectionLoss = @"\\NAS-SYNOLOGY\music\_COLLECTION\";
+        
         public const string FolderRootCollectionLossLess = @"\\NAS-QNAP\music_lossless\_COLLECTION\";
+        //public const string FolderRootCollectionLossLess = @"\\NAS-SYNOLOGY\music_lossless\_COLLECTION\";
 
         public const string FileExtensionsFilterLoss = "*.MP3,*.WMA";
         public const string FileExtensionsFilterLossLess = "*.FLAC,*.APE,*.WV,*.WAVE";
@@ -15,6 +20,9 @@ namespace MusicCollectionList
 
         public const string TreeCsvFileNameCollectionLoss = "Music_Tree_Loss.csv";
         public const string TreeCsvFileNameCollectionLossLess = "Music_Tree_LossLess.csv";
+
+        public const string TreeTempFileNameCollectionLoss = "Music_Tree_Loss.tmp";
+        public const string TreeTempFileNameCollectionLossLess = "Music_Tree_LossLess.tmp";
 
         public const string FileNameArtistsLoss = "Artists_Loss.txt";
         public const string FileNameAlbunsLoss = "Albuns_Loss.txt";

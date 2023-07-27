@@ -1,23 +1,22 @@
 ﻿
 
 using System;
+using MusicCollectionContext;
 
-namespace MusicCollectionList
+namespace MusicCollectionValidators
 {
     internal class CollectionFoldersValidator
     {
         private string _data;
-
-
-        private string MEDIA_FORMAT_TAGS;
+        private string _mediaFormatTags;
 
         public CollectionFoldersValidator(CollectionOriginType collectionOriginType)
         {
             if (collectionOriginType == CollectionOriginType.Loss)
-                MEDIA_FORMAT_TAGS = Constants.MEDIA_FORMAT_TAG_LOSS;
+                _mediaFormatTags = Constants.MEDIA_FORMAT_TAG_LOSS;
 
             if (collectionOriginType == CollectionOriginType.Lossless)
-                MEDIA_FORMAT_TAGS = Constants.MEDIA_FORMAT_TAG_LOSSLESS;
+                _mediaFormatTags = Constants.MEDIA_FORMAT_TAG_LOSSLESS;
         }
 
         public CollectionFoldersValidatorResult ValidateFolder(string data)
@@ -63,7 +62,7 @@ namespace MusicCollectionList
             }
             catch(Exception ex)
             {
-                result = new CollectionFoldersValidatorResult(CollectionFolderType.Error, "-Folder:[{_data}] -Error:[{ex.Message}");
+                result = new CollectionFoldersValidatorResult(CollectionFolderType.Error, $"-Folder:[{_data}] -Error:[{ex.Message}");
             }
  
             return result;
@@ -163,7 +162,6 @@ namespace MusicCollectionList
 
             return CollectionFolderType.None;
         }
-
 
         private CollectionFoldersValidatorResult ValidateArtistFolderRules()
         {
@@ -296,7 +294,7 @@ namespace MusicCollectionList
             if (temp.Contains(" "))
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, "Album: @File media type is with spaces");
 
-            if (!MEDIA_FORMAT_TAGS.Contains(temp.Substring(1)))
+            if (!_mediaFormatTags.Contains(temp.Substring(1)))
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, "Album: @File media type is invalid");
 
 

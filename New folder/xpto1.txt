@@ -1,0 +1,115 @@
+
+ls -Rlha
+-----------
+
+.:
+total 40K
+drwxrwxr-x 6 luso luso 4,0K jul 16 19:22 .
+drwxrwxr-x 5 luso luso 4,0K jul 16 19:00 ..
+-rw-rw-r-- 1 luso luso 1,6K jul 14 10:53 aa (copy).csprojOLD
+-rw-rw-r-- 1 luso luso  514 jul 16 19:25 aa.csproj
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 bin
+-rw-rw-r-- 1 luso luso 3,5K jul 16 19:50 LinuxHelper.cs
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:06 obj
+-rw-rw-r-- 1 luso luso 2,7K jul 16 15:40 Program.cs
+drwxrwxr-x 2 luso luso 4,0K jul 16 19:20 .vscode
+drwxrwxr-x 2 luso luso 4,0K jul 16 19:20 vscode (copy)
+-rw-rw-r-- 1 luso luso    0 jul 16 19:50 xpto.txt
+
+./bin:
+total 12K
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 .
+drwxrwxr-x 6 luso luso 4,0K jul 16 19:22 ..
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 Debug
+
+./bin/Debug:
+total 12K
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 .
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 ..
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:50 net6.0
+
+./bin/Debug/net6.0:
+total 344K
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:50 .
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 ..
+-rwxr-xr-x 1 luso luso  71K jul 16 19:50 aa
+-rw-r--r-- 1 root root  640 jul 16 15:49 aa202307161549
+-rw-rw-r-- 1 luso luso 1,2K jul 16 15:55 aa202307161555
+-rw-rw-r-- 1 luso luso 1,3K jul 16 18:57 aa202307161857
+-rw-rw-r-- 1 luso luso  647 jul 16 19:06 aa202307161906
+-rw-rw-r-- 1 luso luso  647 jul 16 19:07 aa202307161907
+-rw-rw-r-- 1 luso luso  647 jul 16 19:13 aa202307161913
+-rw-rw-r-- 1 luso luso 1,9K jul 16 19:22 aa202307161922
+-rw-rw-r-- 1 luso luso  466 jul 16 19:50 aa202307161950
+-rw-rw-r-- 1 luso luso 2,2K jul 16 19:26 aa.deps.json
+-rw-rw-r-- 1 luso luso 8,0K jul 16 19:50 aa.dll
+-rw-rw-r-- 1 luso luso  11K jul 16 19:50 aa.pdb
+-rw-rw-r-- 1 luso luso  139 jul 16 19:06 aa.runtimeconfig.json
+drwxrwxr-x 2 luso luso 4,0K jul 16 15:41 ref
+-rwxrw-r-- 1 luso luso 125K set 10  2020 Serilog.dll
+-rwxrw-r-- 1 luso luso  35K set  6  2022 Serilog.Sinks.Console.dll
+-rwxrw-r-- 1 luso luso  31K jun 25  2021 Serilog.Sinks.File.dll
+-rw-r--r-- 1 root root  699 jul 16 15:55 xpto.txt
+
+./bin/Debug/net6.0/ref:
+total 16K
+drwxrwxr-x 2 luso luso 4,0K jul 16 15:41 .
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:50 ..
+-rw-rw-r-- 1 luso luso 5,0K jul 16 15:41 aa.dll
+
+./obj:
+total 36K
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:06 .
+drwxrwxr-x 6 luso luso 4,0K jul 16 19:22 ..
+-rw-rw-r-- 1 luso luso 1,9K jul 16 19:06 aa.csproj.nuget.dgspec.json
+-rw-rw-r-- 1 luso luso 1,1K jul 16 15:41 aa.csproj.nuget.g.props
+-rw-rw-r-- 1 luso luso  149 jul 16 15:41 aa.csproj.nuget.g.targets
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 Debug
+-rw-rw-r-- 1 luso luso 5,5K jul 16 19:06 project.assets.json
+-rw-rw-r-- 1 luso luso  534 jul 16 19:06 project.nuget.cache
+
+./obj/Debug:
+total 12K
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 .
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:06 ..
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:26 net6.0
+
+./obj/Debug/net6.0:
+total 208K
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:26 .
+drwxrwxr-x 3 luso luso 4,0K jul 16 15:41 ..
+-rw-rw-r-- 1 luso luso  917 jul 16 15:41 aa.AssemblyInfo.cs
+-rw-rw-r-- 1 luso luso   41 jul 16 15:41 aa.AssemblyInfoInputs.cache
+-rw-rw-r-- 1 luso luso 1,3K jul 16 19:06 aa.assets.cache
+-rw-rw-r-- 1 luso luso  71K jul 16 19:26 aa.csproj.AssemblyReference.cache
+-rw-rw-r-- 1 luso luso    0 jul 16 15:41 aa.csproj.CopyComplete
+-rw-rw-r-- 1 luso luso   41 jul 16 15:41 aa.csproj.CoreCompileInputs.cache
+-rw-rw-r-- 1 luso luso 2,4K jul 16 19:26 aa.csproj.FileListAbsolute.txt
+-rw-rw-r-- 1 luso luso 8,0K jul 16 19:50 aa.dll
+-rw-rw-r-- 1 luso luso  415 jul 16 19:03 aa.GeneratedMSBuildEditorConfig.editorconfig
+-rw-rw-r-- 1 luso luso   41 jul 16 19:06 aa.genruntimeconfig.cache
+-rw-rw-r-- 1 luso luso  11K jul 16 19:50 aa.pdb
+-rwxr-xr-x 1 luso luso  71K jul 16 19:50 apphost
+-rw-rw-r-- 1 luso luso  186 jul 16 15:41 .NETCoreApp,Version=v6.0.AssemblyAttributes.cs
+drwxrwxr-x 2 luso luso 4,0K jul 16 15:41 ref
+
+./obj/Debug/net6.0/ref:
+total 16K
+drwxrwxr-x 2 luso luso 4,0K jul 16 15:41 .
+drwxrwxr-x 3 luso luso 4,0K jul 16 19:26 ..
+-rw-rw-r-- 1 luso luso 5,0K jul 16 19:50 aa.dll
+
+./.vscode:
+total 16K
+drwxrwxr-x 2 luso luso 4,0K jul 16 19:20 .
+drwxrwxr-x 6 luso luso 4,0K jul 16 19:22 ..
+-rw-rw-r-- 1 luso luso 1,1K jul 16 19:20 launch.json
+-rw-rw-r-- 1 luso luso 1,1K jul 16 19:20 tasks.json
+
+./vscode (copy):
+total 16K
+drwxrwxr-x 2 luso luso 4,0K jul 16 19:20 .
+drwxrwxr-x 6 luso luso 4,0K jul 16 19:22 ..
+-rw-rw-r-- 1 luso luso 1,1K jul 16 19:20 launch.json
+-rw-rw-r-- 1 luso luso 1,1K jul 16 19:20 tasks.json
+

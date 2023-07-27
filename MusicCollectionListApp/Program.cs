@@ -1,9 +1,15 @@
 ﻿
-using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
-using MusicCollectionList;
+using Serilog;
+using MusicCollectionContext;
+using MusicCollectionSystemIO;
+using MusicCollectionMsDos;
+using MusicCollectionPowerShell;
+using MusicCollectionActions;
+using MusicCollectionValidators;
+using MusicCollectionLinux;
 
 //via dotnet command
 //dotnet add package Microsoft.PowerShell.SDK
@@ -24,16 +30,12 @@ namespace MusicCollectionListApp
         public static int Main(string[] args)
         {
             StartLogger();
-           //Log.Debug
-           // Log.Error()
-            //Log.Fatal
-            //Log.Warning
 
             Log.Information("App Started...");
 
             Startwatch();
 
-            CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
+            CollectionOriginType collectionOriginType = CollectionOriginType.Lossless;
 
             //==================================================================
             //Action 1 - Extract tree folder/files and save result in text file
@@ -42,18 +44,21 @@ namespace MusicCollectionListApp
 
             //-------------------------------------------------------------
             //Option 1 - Extractor Files and Folder via (CMD / DOS command)
+            //
+            //TOP 1 - BEST HIGH PERFORMANCE
             //-------------------------------------------------------------
-            MsDosShellHelper msDosShellHelper = new();  //TOP 1 - BEST HIGH PERFORMANCE
-            //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly);
-            //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+            MsDosShellHelper msDosShellHelper = new();
+            //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
+            //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
+            msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
             //-----------------------------------------------------
             //Option 2- Extractor Files and Folder via (PowerShell)
+            //
+            //TOP 2 - MIDLE PERFORMANCE
             //-----------------------------------------------------
             var powerShellHelper = new PowerShellHelper();
-
-            //TOP 2 - BEST PERFORMANCE
 
             //V1 - using powershell pipeline
             ////powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
@@ -63,15 +68,31 @@ namespace MusicCollectionListApp
 
             //V3 -using powershell execute script
             //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, false);
 
 
-            //---------------------------------------------------------------------
+            //--------------------------------------------------------------------------------------------
             //Option 3- Extractor Files and Folder via (C#) , Directory.GetDirectories, Directory.GetFiles
-            //---------------------------------------------------------------------
+            //
+            //TOP 3 - LOW PERFORMANCE
+            //--------------------------------------------------------------------------------------------
 
-            // via C# extract treefolder/files and save result 3 in text file (Artists, Albuns and tracks
-            var extractor = new SystemIOShellHelper();
-            //extractor.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);  //LOW PERFORMANCE
+            // via C# extract treefolder/files and save result 3 in text file (Artists, Albums and tracks
+            var systemIOShellHelper = new SystemIOShellHelper();
+            //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true);
+            //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+
+
+            //-------------------------------------------------------------------
+            //Option 4 - Extractor Files and Folder via (LINUX bash / ls command)
+            //
+            //TOP 1 - BEST HIGH PERFORMANCE
+            //--------------------------------------------------------------------
+            LinuxShellHelper linuxShellHelper = new();
+            //linuxShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
+            //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
+            //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
+
 
 
             //===================================================================
@@ -97,14 +118,12 @@ namespace MusicCollectionListApp
             //===================================================================
 
             //---------------------------------------------------------------------
-            var validateCollection = new ValidateCollection();
+            var validateCollection = new ValidateCollectionAction();
             //validateCollection.ValidateSequencialFileWithTreeCollection(collectionOriginType);
             //---------------------------------------------------------------------
 
             //////////////////////////////////////////
-            ///
-            var test = new Test();
-            test.RunIt();
+
             Stopwatch();
 
             Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");

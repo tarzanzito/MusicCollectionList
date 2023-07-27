@@ -1,11 +1,12 @@
-﻿using Serilog;
+﻿using MusicCollectionContext;
+using Serilog;
 using System;
 using System.IO;
 
 
-namespace MusicCollectionList
+namespace MusicCollectionValidators
 {
-    public class ValidateCollection
+    public class ValidateCollectionAction
     {
         string _rootPath;
         string _fileNameIn;
@@ -25,8 +26,8 @@ namespace MusicCollectionList
 
                 _validator = new CollectionFoldersValidator(collectionOriginType);
 
-                _writer = new StreamWriter(_fileNameError);
-                _reader = new StreamReader(_fileNameIn);
+                _writer = new StreamWriter(_fileNameError, false, Constants.StreamsEncoding);
+                _reader = new StreamReader(_fileNameIn, Constants.StreamsEncoding);
 
                 int count = 0;
 

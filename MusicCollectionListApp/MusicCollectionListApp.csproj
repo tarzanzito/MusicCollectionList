@@ -2,12 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+   <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
 
-	  <DebugType>none</DebugType>
-	  <DebugSymbols>false</DebugSymbols>
+	  
+	  <!--nao faz debug-->
+	  <!--<DebugType>none</DebugType>-->
+	  <!--<DebugSymbols>false</DebugSymbols>-->
 	  
     <!--<Title>MusicCollectionListApp</Title>-->
     <!--<StartupObject>MusicCollectionListApp.Program</StartupObject>-->
@@ -16,15 +18,14 @@
 	<!--<PublishAot>True</PublishAot>-->
 	<!--<RunAOTCompilation>true</RunAOTCompilation>-->  
 	<!--<PublishReadyToRun>true</PublishReadyToRun>-->
-	  
-	  <PublishSingleFile>true</PublishSingleFile>
-	  <SelfContained>true</SelfContained>
-	  <PublishTrimmed>true</PublishTrimmed>
-	  <InvariantGlobalization>true</InvariantGlobalization>
-	  <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-	  <DebugType>none</DebugType>
-	  <DebugSymbols>false</DebugSymbols>
+
+	  <!--  <PublishSingleFile>true</PublishSingleFile>-->
+	<!--  <SelfContained>true</SelfContained>-->
+<!--	  <PublishTrimmed>true</PublishTrimmed>-->
+<!--	  <InvariantGlobalization>true</InvariantGlobalization>-->
+<!--	  <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>-->
+<!--	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>-->
+
 
 	  <!--  <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
   </PropertyGroup>
@@ -43,7 +44,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MusicCollectionList\MusicCollectionList.csproj" />
+    <ProjectReference Include="..\MusicCollectionActions\MusicCollectionActions.csproj" />
+    <ProjectReference Include="..\MusicCollectionContext\MusicCollectionContext.csproj" />
+    <ProjectReference Include="..\MusicCollectionLinuxShell\MusicCollectionLinuxShell.csproj" />
+    <ProjectReference Include="..\MusicCollectionMsDosShell\MusicCollectionMsDosShell.csproj" />
+    <ProjectReference Include="..\MusicCollectionPowerShell\MusicCollectionPowerShell.csproj" />
+    <ProjectReference Include="..\MusicCollectionSystemIO\MusicCollectionSystemIO.csproj" />
+    <ProjectReference Include="..\MusicCollectionValidators\MusicCollectionValidators.csproj" />
   </ItemGroup>
 
 </Project>
