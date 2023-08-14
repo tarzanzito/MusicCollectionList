@@ -65,7 +65,7 @@ namespace MusicCollectionListApp
 
             //V2 - using powershell string command
             ////powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
-            //powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
+            powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
 
             //V3 -using powershell execute script
             //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);

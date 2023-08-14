@@ -222,7 +222,10 @@ namespace MusicCollectionMsDos
             Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Started...");
 
             if (!File.Exists(_fullFileNameTemp))
+            {
+                Log.Error($"Folder Root not exists=[{_fullFileNameTemp}");
                 return;
+            }
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");

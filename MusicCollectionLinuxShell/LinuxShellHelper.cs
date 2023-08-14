@@ -178,14 +178,17 @@ namespace MusicCollectionLinux
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "LinuxShellHelper", "ChangeOutputToLinearFormat");
 
-            _fullFileNameTemp = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless.txt";
-            _fullFileNameOut = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless_new.txt";
-            _applyExtensionsFilter = false;
+            //_fullFileNameTemp = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless.txt";
+            //_fullFileNameOut = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless_new.txt";
+            //_applyExtensionsFilter = false;
 
             if (!File.Exists(_fullFileNameTemp))
+            {
+                Log.Error($"Folder Root not exists=[{_fullFileNameTemp}");
                 return;
+            }
 
-             _streamReader = null;
+            _streamReader = null;
              _streamWriter = null;
 
             string line = "";

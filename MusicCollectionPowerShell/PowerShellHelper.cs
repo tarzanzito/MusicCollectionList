@@ -82,19 +82,19 @@ namespace MusicCollectionPowerShell
             }
         }
 
-        private void ScriptInvoke(PowerShell powerShell)
+        private void Invoke(PowerShell powerShell)
         {
-            Log.Information("'PowerShellHelper.ScriptInvoke' - Started...");
+            Log.Information("'PowerShellHelper.Invoke' - Started...");
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
-            Utils.Startwatch(stopwatch, "PowerShellHelper", "ScriptInvoke");
+            Utils.Startwatch(stopwatch, "PowerShellHelper", "Invoke");
 
             try
             {
                 System.Collections.ObjectModel.Collection<PSObject> results = powerShell.Invoke();
                 foreach (PSObject result in results)
                 {
-                    Log.Information(result.ToString());
+                    Log.Warning(result.ToString());
                 }
 
                 //if (powerShell.Error.Count > 0)
@@ -114,7 +114,7 @@ namespace MusicCollectionPowerShell
                     powerShell.Dispose();
                 }
 
-                Log.Information("'PowerShellHelper.ScriptInvoke' - Finished...");
+                Log.Information("'PowerShellHelper.Invoke' - Finished...");
             }
         }
 
@@ -162,7 +162,7 @@ namespace MusicCollectionPowerShell
                 if ((applyFilterExtensions) && (contextFilter != FileSystemContextFilter.DirectoriesOnly))
                 {
                     if (_extensionFilterArray != null)
-                        command1.Parameters.Add("Include", _extensionFilterArray); //several extensions
+                        command1.Parameters.Add("Include", _extensionFilterArray); //several extensions rever!!!!!!!!!!!!! é uma string e nao strin[]
                     else if (_extensionFilter.Length > 0)
                         command1.Parameters.Add("Filter", _extensionFilter); //only one extension
                 }
@@ -226,50 +226,41 @@ namespace MusicCollectionPowerShell
                 }
 
                 //Mount Command
-                powerShell = PowerShell.Create();
 
-                Command c1 = new("Get-ChildItem");
-                powerShell.AddCommand("Get-ChildItem");
-
-                powerShell.AddParameter("LiteralPath", _rootPath);
+                Command command1 = new("Get-ChildItem");
+                command1.Parameters.Add("LiteralPath", _rootPath);
 
                 //Context, only: All, Directories, Files 
                 if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
-                    powerShell.AddParameter("Directory");
+                    command1.Parameters.Add("Directory");
                 if (contextFilter == FileSystemContextFilter.FilesOnly)
-                    powerShell.AddParameter("File");
+                    command1.Parameters.Add("File");
 
                 //Extension filter
                 if ((applyFilterExtensions) && (contextFilter != FileSystemContextFilter.DirectoriesOnly))
                 {
                     if (_extensionFilterArray != null)
-                        powerShell.AddParameter("Include", _extensionFilterArray);
+                        command1.Parameters.Add("Include", _extensionFilterArray); //example "*.cs,*,wav"
                     else if (_extensionFilter.Length > 0)
-                        powerShell.AddParameter("Filter", _extensionFilter);
+                        command1.Parameters.Add("Filter", _extensionFilter); 
                 }
 
-                powerShell.AddParameter("Recurse");
+                //powerShell.AddParameter("Recurse");
+                command1.Parameters.Add("Recurse");
                 //powerShell.AddParameter("Name"); //set output like 'liner format' but do not show difference between Directory and File
 
+                //
 
-                ////////////////////////
-                System.Collections.ObjectModel.Collection<PSObject> results = powerShell.Invoke();
-                //PSDataStreams PSDataStreams = powerShell.Streams.
-                
-                _writer = new StreamWriter(_fullFileNameTemp, false, Constants.StreamsEncoding);
+               Command command2 = new("Out-File");
+               command2.Parameters.Add("File", _fullFileNameTemp); //output file
 
-                foreach (PSObject item in results)
-                {
-                    _writer.WriteLine(item.ToString());
-                    _writer.Flush();
-                }
 
-                //saber como passar results para input de "Out-File"  like "dir>aa.txt"
-                //ps.Commands.Clear();
-                //ps.AddCommand("Out-File");
-                //ps.AddParameter("File", @"d:\mp3_bbbb.txt");
-                //results = ps.Invoke();
-                ////////////////////////////////////////////////////
+                powerShell = PowerShell.Create();
+                powerShell.Commands.AddCommand(command1);
+                powerShell.Commands.AddCommand(command2);
+
+                //RUN
+                Invoke(powerShell);
 
                 if (setToLinearOutputFormat)
                     ChangeOutputToLinearFormat();
@@ -354,7 +345,7 @@ namespace MusicCollectionPowerShell
                 powerShell.AddScript(script);
 
                 //RUN
-                ScriptInvoke(powerShell);
+                Invoke(powerShell);
                 
                 if (setToLinearOutputFormat)
                     ChangeOutputToLinearFormat();
@@ -412,7 +403,10 @@ namespace MusicCollectionPowerShell
             Log.Information("'PowerShellHelper.ChangeOutputToLinearFormat' - Started...");
 
             if (!File.Exists(_fullFileNameTemp))
+            {
+                Log.Error($"Folder Root not exists=[{_fullFileNameTemp}");
                 return;
+            }
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "PowerShellHelper", "ChangeOutputToLinearFormat");
