@@ -98,13 +98,13 @@ namespace MusicCollectionValidators
                     continue;
 
                 if (result.CollectionFolderType == CollectionFolderType.MaybeArtistOrAlbum)
-                    _writer.WriteLine($"{line};{result.CollectionFolderType.ToString()};{result.Info}");
+                    _writer.WriteLine($"{line};{result.CollectionFolderType};{result.Info}");
 
                 if (result.CollectionFolderType == CollectionFolderType.IncorrectFormat)
-                    _writer.WriteLine($"{line};{result.CollectionFolderType.ToString()};{result.Info}");
+                    _writer.WriteLine($"{line};{result.CollectionFolderType};{result.Info}");
 
                 if (result.CollectionFolderType == CollectionFolderType.Error)
-                    _writer.WriteLine($"{line};{result.CollectionFolderType.ToString()};{result.Info}");
+                    _writer.WriteLine($"{line};{result.CollectionFolderType};{result.Info}");
             }
         }
 

@@ -8,7 +8,7 @@ namespace MusicCollectionValidators
     internal class CollectionFoldersValidator
     {
         private string _data;
-        private string _mediaFormatTags;
+        private readonly string _mediaFormatTags;
 
         public CollectionFoldersValidator(CollectionOriginType collectionOriginType)
         {
@@ -291,7 +291,7 @@ namespace MusicCollectionValidators
             if (temp.Substring(0, 1) != Constants.MEDIA_FORMAT_TAG.ToString())
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, "Album: @File media type is empty");
 
-            if (temp.Contains(" "))
+            if (temp.Contains(' '))
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, "Album: @File media type is with spaces");
 
             if (!_mediaFormatTags.Contains(temp.Substring(1)))

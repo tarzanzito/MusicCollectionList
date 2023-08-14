@@ -1,8 +1,8 @@
 ﻿using MusicCollectionContext;
 using Serilog;
 using System;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 namespace MusicCollectionSystemIO
 {
@@ -13,27 +13,33 @@ namespace MusicCollectionSystemIO
         private string _extensionFilter;
         private bool _applyExtensionsFilter;
 
-
         /// <summary>
-        /// generate file with tree of files and folders: typical output like command "DIR /S /B"
-        /// /B = linear format - AbsoluteFullPathName\FileName
-        /// lines example: 
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3
+        /// generate text file with system tree with files and folders.
+        /// 
+        /// line output format:
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\                             "folder"
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3   "file"
+        /// 
+        /// Note: This method add '/' or '\' at end if an folder.
+        ///       
         /// </summary>
         /// <param name="collectionOriginType"></param>
         /// <param name="contextFilter"></param>
+        /// <param name="applyExtensionsFilter"></param>
         public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter)
         {
             _contextFilter = contextFilter;
             _applyExtensionsFilter = applyExtensionsFilter;
 
+            Log.Information("'MusicCollectionSystemIO.TreeProcess' Started...");
+
+            Stopwatch stopwatch = Utils.GetNewStopwatch();
+            Utils.Startwatch(stopwatch, "SystemIOShellHelper", "TreeProcess");
+
             try
             {
                 string rootPath;
                 string fullFileNameOut;
-
-                Log.Information("TreeProcess Started...");
 
                 //output files
                 if (collectionOriginType == CollectionOriginType.Loss)
@@ -51,9 +57,19 @@ namespace MusicCollectionSystemIO
                         _extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
                 }
 
+                if (applyExtensionsFilter)
+                    _applyExtensionsFilter = _extensionFilter.Length > 0;
+
+                if (!Directory.Exists(rootPath))
+                {
+                    Log.Error($"Folder Root not exists=[{rootPath}");
+                    return;
+                }
+
+                Log.Information($"Root Path:[{rootPath}]");
                 Log.Information($"Output File:[{fullFileNameOut}]");
-                Log.Information($"Context Filter:[{contextFilter.ToString()}]");
-                Log.Information($"Apply Extensions Filter:[{applyExtensionsFilter.ToString()}]");
+                Log.Information($"Context Filter:[{contextFilter}]");
+                Log.Information($"Apply Extensions Filter:[{applyExtensionsFilter}]");
                 Log.Information($"Extensions Filter:[{_extensionFilter}]");
 
                 _streamWriter = new StreamWriter(fullFileNameOut, false, Constants.StreamsEncoding);
@@ -73,7 +89,9 @@ namespace MusicCollectionSystemIO
                     _streamWriter.Dispose();
                 }
 
-                Log.Information("TreeProcess Finished...");
+                Utils.Stopwatch(stopwatch, "SystemIOShellHelper", "TreeProcess");
+
+                Log.Information("'MusicCollectionSystemIO.TreeProcess' Finished...");
             }
         }
 
@@ -82,16 +100,18 @@ namespace MusicCollectionSystemIO
             // Get all directories  
             string[] directoriesEntry = Directory.GetDirectories(directory);
 
+            //process directories
             if ((_contextFilter == FileSystemContextFilter.All) || (_contextFilter == FileSystemContextFilter.DirectoriesOnly))
             {
-                foreach (string dir in directoriesEntry)
+                foreach (string item in directoriesEntry)
                 {
                     //Mark Directories with DirectorySeparatorChar at end
-                    _streamWriter.WriteLine($"{dir}{Path.DirectorySeparatorChar}");
+                    _streamWriter.WriteLine($"{item}{Path.DirectorySeparatorChar}");
                     _streamWriter.Flush();
                 }
             }
 
+            //process files
             if ((_contextFilter == FileSystemContextFilter.All) || (_contextFilter == FileSystemContextFilter.FilesOnly))
             {
                 // Get all files
@@ -99,26 +119,25 @@ namespace MusicCollectionSystemIO
 
                 bool isValid = true;
                 
-                foreach (string file in filesEntries)
+                foreach (string item in filesEntries)
                 {
                     if (_applyExtensionsFilter)
                     {
-                        string extension = Path.GetExtension(file).ToUpper().Trim();
+                        string extension = Path.GetExtension(item).ToUpper().Trim();
                         isValid = _extensionFilter.Contains(extension);
                     }
 
                     if (isValid)
                     {
-                        _streamWriter.WriteLine(file);
+                        _streamWriter.WriteLine(item);
                         _streamWriter.Flush();
                     }
                 }
             }
 
-            //next tree
+            //process next tree directories
             foreach (string dir in directoriesEntry)
                 LoadDirectoryInfo(dir);
         }
-
     }
 }

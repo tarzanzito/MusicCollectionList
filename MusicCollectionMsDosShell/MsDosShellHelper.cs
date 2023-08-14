@@ -1,97 +1,114 @@
-﻿using MusicCollectionContext;
+﻿
+using MusicCollectionContext;
 using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
 
+
 namespace MusicCollectionMsDos
 {
     public class MsDosShellHelper
     {
+         private StreamReader _streamReader;
         private StreamWriter _streamWriter;
+        private string _fullFileNameTemp;
+        private string _fullFileNameOut;
+        private FileSystemContextFilter _contextFilter;
+        private string _extensionFilter;
+        private bool _applyExtensionsFilter;
+
 
         /// <summary>
+        /// generate text file with system tree with files and folders: typical output like command "DIR /S /B"
+        /// /B = linear format - AbsoluteFullPathName\FileName
+        /// /B lines example: 
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3                              "folder"
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3   "file"
         /// 
-        //https://ss64.com/nt/dir.html
-        //  /S     - All sub-folders (tree)
-        //  /A:-D  - Get all except folders
-        //  /A:D   - Get only folders
-        //  /B     - linear output format, Bare format (no heading, file sizes or summary).
-        //           but do not show diference between files and directories.
-        //           bash 'ls' command in linux add char '/' at end if directory
-        //
-        /// linear output format examples: 
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3
+        /// Note: /B output do not show difference between file and folder
+        ///       so /B is no longer used in these methods  
+        ///       
+        /// This method add '\' at end of any folder.
+        /// 
         /// </summary>
         /// <param name="collectionOriginType"></param>
         /// <param name="contextFilter"></param>
-        /// <param name="useLinearOutputFormat"></param>
-        public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool useLinearOutputFormat = true)
+        /// <param name="applyExtensionsFilter"></param>
+        /// <param name="setToLinearOutputFormat"></param>
+        /// 
+        public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
+            Log.Information("'MusicCollectionMsDos.TreeProcess' - Started...");
+
             try
             {
-                Log.Information("'MusicCollectionMsDos.TreeProcess' - Started...");
+                _contextFilter = contextFilter;
+                _applyExtensionsFilter = applyExtensionsFilter;
 
                 string rootPath;
-                string fullFileNameOut;
-                string fullFileNameTemp;
-                string extensionFilter = "";
 
                 //output files
                 if (collectionOriginType == CollectionOriginType.Loss)
                 {
                     rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
-                    fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
-                    fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
+                    _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
+                    _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
                     if (applyExtensionsFilter)
-                        extensionFilter = Constants.FileExtensionsFilterLoss.Trim().Replace("*", "").ToUpper();
+                        _extensionFilter = Constants.FileExtensionsFilterLoss.Trim().Replace("*", "").ToUpper();
                 }
                 else
                 {
                     rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
-                    fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
-                    fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
+                    _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
+                    _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
                     if (applyExtensionsFilter)
-                        extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
+                        _extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
                 }
 
-                //make dos command
-                string linearOutputFormat = "";
-                string msDosCommand = "";
+                if (applyExtensionsFilter)
+                    _applyExtensionsFilter = _extensionFilter.Length > 0;
 
-                //if (useLinearOutputFormat)
-                //{
-                //    linearOutputFormat = "/B "; 
-                //    fullFileNameTemp = fullFileNameOut;
-                //}
-                if (!useLinearOutputFormat)
-                    fullFileNameTemp = fullFileNameOut;
+                if (!Directory.Exists(rootPath))
+                {
+                    Log.Error($"Folder Root not exists=[{rootPath}");
+                    return;
+                }
+
+                if (!setToLinearOutputFormat)
+                    _fullFileNameTemp = _fullFileNameOut;
+
+                //make MS-DOS command
+
+                //NOTE: because the /B option does not show the difference between folder and file, /B is no longer used)
+                //(but can see on DesableOption_B();
+                
+                string msDosCommand = "";
 
                 switch (contextFilter)
                 {
                     case FileSystemContextFilter.All:
-                        msDosCommand = $"/C chcp 65001 & dir /S {linearOutputFormat}{rootPath}";
+                        msDosCommand = $"chcp 65001 & dir /S {rootPath}";
                         break;
                     case FileSystemContextFilter.DirectoriesOnly:
-                        msDosCommand = $"/C chcp 65001 & dir /S /A:D {useLinearOutputFormat}{rootPath}";
+                        msDosCommand = $"chcp 65001 & dir /S /A:D {rootPath}";
                         break;
                     case FileSystemContextFilter.FilesOnly:
-                        msDosCommand = $"/C chcp 65001 & dir /S /A:-D {useLinearOutputFormat}{rootPath}";
+                        msDosCommand = $"chcp 65001 & dir /S /A:-D {rootPath}";
                         break;
                 }
 
-                Log.Information($"Output File:[{fullFileNameOut}]");
-                Log.Information($"Context Filter:[{contextFilter.ToString()}]");
-                Log.Information($"Apply Extensions Filter:[{applyExtensionsFilter.ToString()}]");
-                Log.Information($"Extensions Filter:[{extensionFilter}]");
+                Log.Information($"Output File:[{_fullFileNameOut}]");
+                Log.Information($"Context Filter:[{_contextFilter}]");
+                Log.Information($"Apply Extensions Filter:[{_applyExtensionsFilter}]");
+                Log.Information($"Extensions Filter:[{_extensionFilter}]");
                 Log.Information($"MS-DOS Command:[{msDosCommand}]");
 
                 //process 
-                bool resultOk = MsDosProcess(msDosCommand, fullFileNameTemp);
+                bool resultOk = MsDosProcess(msDosCommand);
 
-                if (resultOk && (useLinearOutputFormat))
-                    ChangeOutputToLinearFormat(fullFileNameTemp, fullFileNameOut, contextFilter, extensionFilter);
+                if (resultOk && setToLinearOutputFormat)
+                    ChangeOutputToLinearFormat();
             }
             catch (Exception ex)
             {
@@ -103,40 +120,43 @@ namespace MusicCollectionMsDos
             }
         }
 
-        private bool MsDosProcess(string msDosCommand, string fullFileNameOut)
+        private bool MsDosProcess(string msDosCommand)
         {
+            Log.Information("'MusicCollectionMsDos.MsDosProcess' - Started...");
+
+            Stopwatch stopwatch = Utils.GetNewStopwatch();
+            Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
+            
             bool retValue = true;
 
             try
             {
-                Log.Information("'MusicCollectionMsDos.MsDosProcess' - Started...");
-
                 //output
-                _streamWriter = new StreamWriter(fullFileNameOut, false, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
 
                 //Process Info
-                System.Diagnostics.ProcessStartInfo startInfo = new();
+                ProcessStartInfo startInfo = new();
                 startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = msDosCommand;
+                startInfo.Arguments = $"/C {msDosCommand}";
 
                 //dos without window
                 //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 //startInfo.UseShellExecute = false;
                 //startInfo.CreateNoWindow = false;
 
-                //output to files
+                //redirect output to files
                 startInfo.RedirectStandardOutput = true;
                 startInfo.RedirectStandardError = true;
 
                 //Process
-                System.Diagnostics.Process process = new();
+                Process process = new();
                 process.StartInfo = startInfo;
 
                 //V1
                 process.OutputDataReceived += OutputDataReceived;
                 process.ErrorDataReceived += ErrorDataReceived;
 
-                //V2
+                //V2 - with lambdar (i dont like)
                 //process.OutputDataReceived += (sender, args) =>
                 //{
                 //    _streamWriter.WriteLine(args.Data);
@@ -149,6 +169,7 @@ namespace MusicCollectionMsDos
                 //    _streamWriter.Flush();
                 //};
 
+
                 //Start
                 process.Start();
                 process.BeginOutputReadLine(); //important to file output 
@@ -157,7 +178,7 @@ namespace MusicCollectionMsDos
             catch (Exception ex)
             {
                 Log.Error($"Command:{msDosCommand}");
-                Log.Error($"Outout:{fullFileNameOut}");
+                Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
                 retValue = false;
             }
@@ -169,6 +190,8 @@ namespace MusicCollectionMsDos
                     _streamWriter.Close();
                     _streamWriter.Dispose();
                 }
+
+                Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
 
                 Log.Information("'MusicCollectionMsDos.MsDosProcess' - Finished...");
             }
@@ -189,49 +212,48 @@ namespace MusicCollectionMsDos
         }
 
         /// <summary>
-        /// set output like linear fprmat: "dir /B"
+        /// set output like linear format ("dir /B") but adding char '\' at the end of folder entries
         /// lines example: 
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\   "folder"
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3  "file"
         /// </summary>
-        /// <param name="contextFilter"></param>
-        private void ChangeOutputToLinearFormat(string fullFileNameTemp, string fullFileNameOut, FileSystemContextFilter contextFilter, string extensionFilter)
+        private void ChangeOutputToLinearFormat()
         {
-            if (!File.Exists(fullFileNameTemp))
+            Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Started...");
+
+            if (!File.Exists(_fullFileNameTemp))
                 return;
 
-            StreamReader reader = null;
+            Stopwatch stopwatch = Utils.GetNewStopwatch();
+            Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
+
             StreamWriter writer = null;
             int count = 0;
             string line = "";
 
             try
             {
-                Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Syarted...");
-
-                bool applyExtensionsFilter = extensionFilter.Length > 0;
-
-                reader = new StreamReader(fullFileNameTemp, Constants.StreamsEncoding);
-                writer = new StreamWriter(fullFileNameOut, false, Constants.StreamsEncoding);
+                _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
 
                 bool isFolder = false;
                 bool isValid = false;
                 string baseDir = "";
-                string member;
-                char dirMark = '\0';
+                string item;
+                char dirMark;
 
-                while ((line = reader.ReadLine()) != null)
+                while ((line = _streamReader.ReadLine()) != null)
                 {
-                    if (line.Length < 14)
+                    if (line.Length < 14) //less than phrase " Directory of "
                         continue;
 
-                    if (line.Substring(0, 14) == " Directory of ")
+                    if (line.Substring(0, 14) == " Directory of ") //new directory
                     {
                         baseDir = line.Substring(14);
                         continue;
                     }
 
-                    if (line.Length < 37)
+                    if (line.Length < 37) //less than phrase "2022/09/21  22:53    <DIR>          "
                         continue;
 
                     if (!DateTime.TryParse(line.Substring(0, 10), out DateTime dt))
@@ -239,38 +261,43 @@ namespace MusicCollectionMsDos
 
                     isFolder = (line.Substring(21, 5) == "<DIR>");
 
-                    member = line.Substring(36);
+                    item = line.Substring(36);
 
-                    if (isFolder && (member == ".") || (member == ".."))
+                    if (isFolder && (item == ".") || (item == ".."))
                         continue;
 
                     //
 
+                    //Verify Context Filter
+                    if (isFolder)
+                        if (_contextFilter == FileSystemContextFilter.FilesOnly)
+                            continue;
+                    else
+                        if (_contextFilter == FileSystemContextFilter.DirectoriesOnly)
+                            continue;
+
+                    //Apply Extensions Filter
                     if (isFolder)
                     {
-                        if (contextFilter == FileSystemContextFilter.FilesOnly)
-                            continue;
+                        //append 'DirectorySeparatorChar' at end
                         dirMark = Path.DirectorySeparatorChar;
                         isValid = true;
                     }
-                    else
+                   else
                     {
-                        if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
-                            continue;
-
-                        //applyExtensionsFilter
-                        if (applyExtensionsFilter)
+                        //verify Extensions Filter
+                        if (_applyExtensionsFilter)
                         {
-                            string extension = Path.GetExtension(member).ToUpper().Trim();
-                            isValid = extensionFilter.Contains(extension);
+                            string extension = Path.GetExtension(item).ToUpper().Trim();
+                            isValid = _extensionFilter.Contains(extension);
                         }
-
                         dirMark = '\0';
                     }
 
+                    //write
                     if (isValid)
                     {
-                        writer.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{member}{dirMark}");
+                        writer.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
                         writer.Flush();
                     }
                 }
@@ -281,26 +308,71 @@ namespace MusicCollectionMsDos
             catch (Exception ex)
             {
                 Log.Error($"Line:{line}");
-                Log.Error($"Outout:{fullFileNameOut}");
+                Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
             }
             finally
             {
-                if (reader != null)
+                if (_streamReader != null)
                 {
-                    reader.Close();
-                    reader.Dispose();
+                    _streamReader.Close();
+                    _streamReader.Dispose();
                 }
-                if (writer != null)
+                if (_streamWriter != null)
                 {
-                    writer.Flush();
-                    writer.Close();
-                    writer.Dispose();
+                    _streamWriter.Flush();
+                    _streamWriter.Close();
+                    _streamWriter.Dispose();
                 }
+
+                Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 
                 Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Finished...");
             }
         }
+
+        #region comments
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //private void DesableOption_B()
+        //{
+        //    //NOTE: because the /B option does not show of 'fullName' the difference between folder and file is no longer used)
+        //    //(see commented code at the of this file)
+
+        //    bool useLinearOutputFormat = true;
+        //    string rootPath = "";
+        //    string fullFileNameTemp = "";
+        //    string fullFileNameOut = "";
+        //    string msDosCommand = "";
+        //    FileSystemContextFilter contextFilter = FileSystemContextFilter.All;
+
+        //    string linearOutputFormat = "";
+
+        //    if (useLinearOutputFormat)
+        //    {
+        //        linearOutputFormat = "/B ";
+        //        fullFileNameTemp = fullFileNameOut;
+        //    }
+
+        //    switch (contextFilter)
+        //    {
+        //        case FileSystemContextFilter.All:
+        //            msDosCommand = $"/C chcp 65001 & dir /S {linearOutputFormat}{rootPath}";
+        //            break;
+        //        case FileSystemContextFilter.DirectoriesOnly:
+        //            msDosCommand = $"/C chcp 65001 & dir /S /A:D {useLinearOutputFormat}{rootPath}";
+        //            break;
+        //        case FileSystemContextFilter.FilesOnly:
+        //            msDosCommand = $"/C chcp 65001 & dir /S /A:-D {useLinearOutputFormat}{rootPath}";
+        //            break;
+        //    }
+
+        //    //REF-1 - END source
+        //    string final = msDosCommand;
+        //}
+
+        #endregion comments
     }
 }
 

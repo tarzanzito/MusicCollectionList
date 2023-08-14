@@ -3,57 +3,74 @@ using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace MusicCollectionLinux
 {
     public class LinuxShellHelper
     {
-    
+        private string _rootPath;
+        private string _fullFileNameOut;
+        private string _fullFileNameTemp;
+        private FileSystemContextFilter _contextFilter;
+        private string _extensionFilter;
+        private bool _applyExtensionsFilter;
+        private StreamReader _streamReader;
         private StreamWriter _streamWriter;
 
-        public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool useLinearOutputFormat = true)
+        public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
             Log.Information("'LinuxShellHelper.TreeProcess' - Started...");
-
-            string rootPath;
-        string fullFileNameOut;
-            string fullFileNameTemp;
-            string extensionFilter;
-
-            //output files
-            if (collectionOriginType == CollectionOriginType.Loss)
+            try
             {
-                rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
-                fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
-                fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
-                extensionFilter = Constants.FileExtensionsFilterLoss.Trim().Replace("*", "").ToUpper();
+                _contextFilter = contextFilter;
+                _applyExtensionsFilter = applyExtensionsFilter;
+
+                //output files
+                if (collectionOriginType == CollectionOriginType.Loss)
+                {
+                    _rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
+                    _fullFileNameTemp = System.IO.Path.Join(_rootPath, Constants.TreeTempFileNameCollectionLoss);
+                    _extensionFilter = Constants.FileExtensionsFilterLoss.Trim().Replace("*", "").ToUpper();
+                }
+                else
+                {
+                    _rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
+                    _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
+                    _fullFileNameTemp = System.IO.Path.Join(_rootPath, Constants.TreeTempFileNameCollectionLossLess);
+                    _extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
+                }
+
+                if (setToLinearOutputFormat)
+                    _fullFileNameTemp = _fullFileNameOut;
+
+                if (!Directory.Exists(_rootPath))
+                {
+                    Log.Error($"Foler Root not exists=[{_rootPath}");
+                    return;
+                }
+
+
+                Log.Information($"Output=[{_fullFileNameOut}");
+
+                string bashCommand = $"ls -l -h -a -p -R {_rootPath}";
+                //-p serves to put char '/' at the end of each folder, but this option seems not to be necessary
+
+                //process 
+                bool resultOk = LinuxBashProcess(bashCommand);
+
+                if (resultOk && (setToLinearOutputFormat))
+                    ChangeOutputToLinearFormat();
             }
-            else
+            catch (Exception ex)
             {
-                rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
-                fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
-                fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
-                extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
+                Log.Error($"ERROR EXCEPTION: {ex.Message}");
             }
-
-            if (useLinearOutputFormat)
-                fullFileNameTemp = fullFileNameOut;
-
-            Log.Information($"Output=[{fullFileNameOut}");
-
-            //TODO: Extensions filter
-
-            string bashCommand = $"ls -a -R -p {rootPath}";
-            //startInfo.Arguments = $"-c \"ls -a -R -p\"";
-            //startInfo.Arguments = $"-c \"ls -lha -R\"";
-
-            //process 
-            bool resultOk = LinuxBashProcess(bashCommand, fullFileNameTemp);
-
-            if (resultOk && (useLinearOutputFormat))
-                ChangeOutputToLinearFormat(fullFileNameTemp, fullFileNameOut, contextFilter, extensionFilter);
-
-            Log.Information("'LinuxShellHelper.TreeProcess' - Finished...");
+            finally
+            {
+                Log.Information("'LinuxShellHelper.TreeProcess' - Finished...");
+            }
         }
 
         private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
@@ -68,17 +85,22 @@ namespace MusicCollectionLinux
             _streamWriter.Flush();
         }
 
-        private bool LinuxBashProcess(string bashCommand, string fullFileNameOut)
+        private bool LinuxBashProcess(string bashCommand)
         {
+            Log.Information("'LinuxShellHelper.LinuxBashProcess' - Started...");
+
+            Stopwatch stopwatch = Utils.GetNewStopwatch();
+            Utils.Startwatch(stopwatch, "LinuxShellHelper", "LinuxBashProcess");
+
             bool retValue = true;
 
             try
             {
                 //output                         
-                _streamWriter = new StreamWriter(fullFileNameOut, false); //, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
 
                 //Process Info
-                System.Diagnostics.ProcessStartInfo startInfo = new();
+                ProcessStartInfo startInfo = new();
                 startInfo.FileName = "/bin/bash";
                 startInfo.Arguments = $"-c \"{bashCommand}\"";
 
@@ -120,7 +142,7 @@ namespace MusicCollectionLinux
             catch (Exception ex)
             {
                 Log.Error($"Command:{bashCommand}");
-                Log.Error($"Outout:{fullFileNameOut}");
+                Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
                 retValue = false;
             }
@@ -132,6 +154,10 @@ namespace MusicCollectionLinux
                     _streamWriter.Close();
                     _streamWriter.Dispose();
                 }
+
+                Utils.Stopwatch(stopwatch, "LinuxShellHelper", "LinuxBashProcess");
+
+                Log.Information("'LinuxShellHelper.LinuxBashProcess' - Finished...");
             }
 
             return retValue;
@@ -144,93 +170,151 @@ namespace MusicCollectionLinux
         /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3
         /// </summary>
         /// <param name="contextFilter"></param>
-        private void ChangeOutputToLinearFormat(string fullFileNameTemp, string fullFileNameOut, FileSystemContextFilter contextFilter, string extensionFilter)
+        
+        private void ChangeOutputToLinearFormat()
         {
-            if (!File.Exists(fullFileNameTemp))
+            Log.Information("LinuxShellHelper.ChangeOutputToLinearFormat Started");
+
+            Stopwatch stopwatch = Utils.GetNewStopwatch();
+            Utils.Startwatch(stopwatch, "LinuxShellHelper", "ChangeOutputToLinearFormat");
+
+            _fullFileNameTemp = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless.txt";
+            _fullFileNameOut = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless_new.txt";
+            _applyExtensionsFilter = false;
+
+            if (!File.Exists(_fullFileNameTemp))
                 return;
 
-            StreamReader reader = null;
-            StreamWriter writer = null;
-            int count = 0;
+             _streamReader = null;
+             _streamWriter = null;
+
             string line = "";
 
             try
             {
-                reader = new StreamReader(fullFileNameTemp); //, Constants.StreamsEncoding);
-                writer = new StreamWriter(fullFileNameOut, false); //, Constants.StreamsEncoding);
+                _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
 
-                bool isFolder = false;
-                string baseDir = "";
-                string member;
+                bool isFolder;
+                bool isValid = true;
+                bool useRootPath = true;
+                string basePath = "";
+                string rootPath;
+                string member = "";
 
-                while ((line = reader.ReadLine()) != null)
+                if (_rootPath.EndsWith('/'))
+                    rootPath = _rootPath.Substring(0, _rootPath.Length - 1);
+                else
+                    rootPath = _rootPath;
+
+                while ((line = _streamReader.ReadLine()) != null)
                 {
                     if (line.Length == 0)
                         continue;
 
-                    if ((line == "./") || (line == "../"))
-                    {
+                    if ((line.Length > 5) && (line.StartsWith("total ")))
                         continue;
-                    }
 
                     if (line == ".:")
                     {
-                        baseDir = ".";
+                        useRootPath = true;
+                        basePath = "/";
                         continue;
                     }
 
                     if (line.EndsWith(':') && line.Contains('/'))
                     {
-                        baseDir = line.Substring(0, line.Length - 1);
+                        useRootPath = line.StartsWith('.');
+
+                        if (useRootPath)
+                            basePath = line.Substring(1, line.Length - 2);
+                        else
+                            basePath = line.Substring(0, line.Length - 1);
+
                         continue;
                     }
 
-                    isFolder = line.EndsWith('/');
+                    if (line.Length < 72)
+                        continue;
+
+                    if (!DateTime.TryParse(line.Substring(56, 10), out DateTime dt))
+                        continue;
+
+                    
+                    //isFolder = line.EndsWith('/');
+                    isFolder = line.StartsWith('d');
+                    isValid = true;
+
+                    //Verify Context Filter
                     if (isFolder)
-                        member = line.Substring(0, line.Length - 1);
+                    {
+                        if (_contextFilter == FileSystemContextFilter.FilesOnly)
+                            continue;
+                    }
                     else
-                        member = line;
+                    {
+                        if (_contextFilter == FileSystemContextFilter.DirectoriesOnly)
+                            continue;
+                    }
 
-                    //TODO: colocar char '/' final da string no linear format 
+                    member = line.Substring(72);
 
-                    // if (isFolder)
-                    // {
-                    //     if (contextFilter == FileSystemContextFilter.FilesOnly)
-                    //         continue;
-                    // }
-                    // else
-                    // {
-                    //     if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
-                    //         continue;
-                    // }
+                    if ((member == "./") || (member == "../"))
+                        continue;
 
-                    writer.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{member}");
-                    writer.Flush();
+                    //Apply Extensions Filter
+                    if (!isFolder)
+                    {
+                        //verify Extensions Filter
+                        if (_applyExtensionsFilter)
+                        {
+                            string extension = Path.GetExtension(member).ToUpper().Trim();
+                            isValid = _extensionFilter.Contains(extension);
+                        }
+                    }
+
+                    //write
+                    if (isValid)
+                    {
+                        //_rootPath
+                        string newLine;
+
+                        newLine = System.IO.Path.Join(_rootPath, basePath, member);
+                        if (useRootPath)
+
+                            newLine = $"{rootPath}{basePath}{line}";//{Path.DirectorySeparatorChar}
+                        else
+                            newLine = $"{basePath}{line}";//{Path.DirectorySeparatorChar}
+
+                        _streamWriter.WriteLine(newLine); 
+                        _streamWriter.Flush();
+                    }
                 }
-
-                Log.Information(count.ToString());
-
             }
             catch (Exception ex)
             {
                 Log.Error($"Line:{line}");
-                Log.Error($"Outout:{fullFileNameOut}");
+                Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
             }
             finally
             {
-                if (reader != null)
+                if (_streamReader != null)
                 {
-                    reader.Close();
-                    reader.Dispose();
+                    _streamReader.Close();
+                    _streamReader.Dispose();
                 }
-                if (writer != null)
+                if (_streamWriter != null)
                 {
-                    writer.Flush();
-                    writer.Close();
-                    writer.Dispose();
+                    _streamWriter.Flush();
+                    _streamWriter.Close();
+                    _streamWriter.Dispose();
                 }
             }
+
+            Utils.Stopwatch(stopwatch, "LinuxShellHelper", "ChangeOutputToLinearFormat");
+
+            Log.Information("LinuxShellHelper.ChangeOutputToLinearFormat Finished");
         }
     }
 }

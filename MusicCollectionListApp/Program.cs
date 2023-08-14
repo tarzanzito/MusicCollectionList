@@ -50,7 +50,7 @@ namespace MusicCollectionListApp
             MsDosShellHelper msDosShellHelper = new();
             //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
             //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
-            msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
             //-----------------------------------------------------
@@ -58,17 +58,18 @@ namespace MusicCollectionListApp
             //
             //TOP 2 - MIDLE PERFORMANCE
             //-----------------------------------------------------
-            var powerShellHelper = new PowerShellHelper();
+            PowerShellHelper powerShellHelper = new();
 
             //V1 - using powershell pipeline
             ////powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
             //V2 - using powershell string command
             ////powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+            //powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
 
             //V3 -using powershell execute script
             //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
-            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, false);
+            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, false, true);
 
 
             //--------------------------------------------------------------------------------------------
@@ -78,7 +79,7 @@ namespace MusicCollectionListApp
             //--------------------------------------------------------------------------------------------
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albums and tracks
-            var systemIOShellHelper = new SystemIOShellHelper();
+            SystemIOShellHelper systemIOShellHelper = new();
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true);
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
@@ -91,9 +92,9 @@ namespace MusicCollectionListApp
             LinuxShellHelper linuxShellHelper = new();
             //linuxShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
             //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
-            //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
+            linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
-
+            Stopwatch();
 
             //===================================================================
             //Action 2 - Transform text file from previous step to csv file
@@ -104,7 +105,7 @@ namespace MusicCollectionListApp
             //===================================================================
 
             //---------------------------------------------------------------------
-            var filesTransformer = new FilesTransformer();
+            FilesTransformer filesTransformer = new();
             //filesTransformer.FlatToCSV(collectionOriginType);
             //---------------------------------------------------------------------
 
@@ -118,14 +119,13 @@ namespace MusicCollectionListApp
             //===================================================================
 
             //---------------------------------------------------------------------
-            var validateCollection = new ValidateCollectionAction();
+            ValidateCollectionAction validateCollection = new();
             //validateCollection.ValidateSequencialFileWithTreeCollection(collectionOriginType);
             //---------------------------------------------------------------------
 
             //////////////////////////////////////////
 
-            Stopwatch();
-
+      
             Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
             Console.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
             Log.Warning($"Elapsed: {_watch.ElapsedMilliseconds}");
@@ -168,6 +168,8 @@ namespace MusicCollectionListApp
             _watch.Stop();
 
             Log.Information($"Elapsed: {_watch.ElapsedMilliseconds}");
+            
+            Log.Information("Stopwatch Stopped...");
         }
     }
 }
