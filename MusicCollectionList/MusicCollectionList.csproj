@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+	  
+	  <DebugType>none</DebugType>
+	  <DebugSymbols>false</DebugSymbols>
+	 
+	  <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.8" />
+     <PackageReference Include="Serilog" Version="3.0.1" />
+	  <!--<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.1" /> --> 
+
+  </ItemGroup>
+
+ 
+
+</Project>

@@ -32,15 +32,17 @@ namespace MusicCollectionLinux
                     _rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
                     _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
                     _fullFileNameTemp = System.IO.Path.Join(_rootPath, Constants.TreeTempFileNameCollectionLoss);
-                    _extensionFilter = Constants.FileExtensionsFilterLoss.Trim().Replace("*", "").ToUpper();
+                    _extensionFilter = Constants.FileExtensionsFilterLoss;
                 }
                 else
                 {
                     _rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
                     _fullFileNameOut = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
                     _fullFileNameTemp = System.IO.Path.Join(_rootPath, Constants.TreeTempFileNameCollectionLossLess);
-                    _extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
+                    _extensionFilter = Constants.FileExtensionsFilterLossLess;
                 }
+
+                _extensionFilter = _extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();
 
                 if (setToLinearOutputFormat)
                     _fullFileNameTemp = _fullFileNameOut;

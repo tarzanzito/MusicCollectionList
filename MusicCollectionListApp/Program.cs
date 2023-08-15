@@ -47,7 +47,7 @@ namespace MusicCollectionListApp
             //
             //TOP 1 - BEST HIGH PERFORMANCE
             //-------------------------------------------------------------
-            MsDosShellHelper msDosShellHelper = new();
+             var msDosShellHelper = new MsDosShellHelper();
             //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
             //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
             //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
@@ -58,18 +58,16 @@ namespace MusicCollectionListApp
             //
             //TOP 2 - MIDLE PERFORMANCE
             //-----------------------------------------------------
-            PowerShellHelper powerShellHelper = new();
+             var powerShellHelper = new PowerShellHelper();
 
             //V1 - using powershell pipeline
-            ////powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+            //powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.All, true, true);
 
             //V2 - using powershell string command
-            ////powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
-            powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
 
             //V3 -using powershell execute script
-            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
-            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, false, true);
+            powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
             //--------------------------------------------------------------------------------------------
@@ -79,7 +77,7 @@ namespace MusicCollectionListApp
             //--------------------------------------------------------------------------------------------
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albums and tracks
-            SystemIOShellHelper systemIOShellHelper = new();
+            var systemIOShellHelper = new SystemIOShellHelper();
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true);
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
@@ -89,12 +87,11 @@ namespace MusicCollectionListApp
             //
             //TOP 1 - BEST HIGH PERFORMANCE
             //--------------------------------------------------------------------
-            LinuxShellHelper linuxShellHelper = new();
+             var linuxShellHelper = new LinuxShellHelper();
             //linuxShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
             //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
-            linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
-            Stopwatch();
 
             //===================================================================
             //Action 2 - Transform text file from previous step to csv file
@@ -125,7 +122,8 @@ namespace MusicCollectionListApp
 
             //////////////////////////////////////////
 
-      
+            Stopwatch();
+
             Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
             Console.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
             Log.Warning($"Elapsed: {_watch.ElapsedMilliseconds}");

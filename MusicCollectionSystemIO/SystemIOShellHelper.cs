@@ -47,15 +47,17 @@ namespace MusicCollectionSystemIO
                     rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
                     fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
                     if (applyExtensionsFilter)
-                        _extensionFilter = Constants.FileExtensionsFilterLoss.Trim().Replace("*", "").ToUpper();
+                        _extensionFilter = Constants.FileExtensionsFilterLoss;
                 }
                 else
                 {
                     rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
                     fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
                     if (applyExtensionsFilter)
-                        _extensionFilter = Constants.FileExtensionsFilterLossLess.Trim().Replace("*", "").ToUpper();
+                        _extensionFilter = Constants.FileExtensionsFilterLossLess;
                 }
+
+                _extensionFilter = _extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();
 
                 if (applyExtensionsFilter)
                     _applyExtensionsFilter = _extensionFilter.Length > 0;
