@@ -10,7 +10,7 @@ namespace MusicCollectionMsDos
 {
     public class MsDosShellHelper
     {
-         private StreamReader _streamReader;
+        private StreamReader _streamReader;
         private StreamWriter _streamWriter;
         private string _fullFileNameTemp;
         private string _fullFileNameOut;
@@ -232,12 +232,16 @@ namespace MusicCollectionMsDos
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 
-            StreamWriter writer = null;
             int count = 0;
             string line = "";
 
             try
             {
+                //using (StreamReader reader = new StreamReader(fileName)) //C# 8
+                //{
+                //}
+                //using var _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
+
                 _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
                 _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
 
@@ -302,8 +306,8 @@ namespace MusicCollectionMsDos
                     //write
                     if (isValid)
                     {
-                        writer.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
-                        writer.Flush();
+                        _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
+                        _streamWriter.Flush();
                     }
                 }
 
