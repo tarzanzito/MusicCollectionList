@@ -134,7 +134,7 @@ namespace MusicCollectionMsDos
             try
             {
                 //output
-                _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(_fullFileNameTemp, false, Constants.StreamsEncoding);
 
                 //Process Info
                 ProcessStartInfo startInfo = new();
@@ -279,11 +279,15 @@ namespace MusicCollectionMsDos
 
                     //Verify Context Filter
                     if (isFolder)
+                    {
                         if (_contextFilter == FileSystemContextFilter.FilesOnly)
                             continue;
+                    }
                     else
+                    {
                         if (_contextFilter == FileSystemContextFilter.DirectoriesOnly)
                             continue;
+                    }
 
                     //Apply Extensions Filter
                     if (isFolder)

@@ -15,11 +15,11 @@ namespace MusicCollectionValidators
         StreamReader _reader;
         CollectionFoldersValidator _validator;
 
-        public void ValidateSequencialFileWithTreeCollection(CollectionOriginType collectionOriginType)
+        public void ValidateFoldersRulesFromSequencialFileResult(CollectionOriginType collectionOriginType)
         {
             try
             {
-                DefineFullFileNames(collectionOriginType);
+                PrepareVariables(collectionOriginType);
 
                 Log.Information(_fileNameIn);
                 Log.Information(_fileNameError);
@@ -62,7 +62,7 @@ namespace MusicCollectionValidators
             }
         }
 
-        private void DefineFullFileNames(CollectionOriginType collectionOriginType)
+        private void PrepareVariables(CollectionOriginType collectionOriginType)
         {
             if (collectionOriginType == CollectionOriginType.Loss)
             {

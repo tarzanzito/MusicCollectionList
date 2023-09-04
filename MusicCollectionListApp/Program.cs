@@ -49,7 +49,7 @@ namespace MusicCollectionListApp
             //-------------------------------------------------------------
              var msDosShellHelper = new MsDosShellHelper();
             //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
-            //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
+            msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
             //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
@@ -67,7 +67,7 @@ namespace MusicCollectionListApp
             //powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
 
             //V3 -using powershell execute script
-            powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
             //--------------------------------------------------------------------------------------------
@@ -77,9 +77,10 @@ namespace MusicCollectionListApp
             //--------------------------------------------------------------------------------------------
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albums and tracks
+            
             var systemIOShellHelper = new SystemIOShellHelper();
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true);
-            //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+            //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true);
 
 
             //-------------------------------------------------------------------
@@ -108,16 +109,13 @@ namespace MusicCollectionListApp
 
 
             //===================================================================
-            //Action 3 - Validate  text file from previous step to csv file
-            //and add  prefix 'absolute fullFolder' to line and column extension
-            //columns separated by 'fieldSeparator' char
-            //output format: absolute fullFileName ; extencion
-            //output can be upload to Access and make queries
-            //===================================================================
+            //Action 3 - input file must have only Folders
+            // FileSystemContextFilter.DirectoriesOnly
+           //===================================================================
 
-            //---------------------------------------------------------------------
-            ValidateCollectionAction validateCollection = new();
-            //validateCollection.ValidateSequencialFileWithTreeCollection(collectionOriginType);
+           //---------------------------------------------------------------------
+           ValidateCollectionAction validateCollection = new();
+            validateCollection.ValidateFoldersRulesFromSequencialFileResult(collectionOriginType);
             //---------------------------------------------------------------------
 
             //////////////////////////////////////////
