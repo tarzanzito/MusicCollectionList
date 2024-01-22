@@ -10,6 +10,8 @@ using MusicCollectionPowerShell;
 using MusicCollectionActions;
 using MusicCollectionValidators;
 using MusicCollectionLinux;
+using System.Drawing.Drawing2D;
+using System.Xml.Linq;
 
 //via dotnet command
 //dotnet add package Microsoft.PowerShell.SDK
@@ -35,10 +37,16 @@ namespace MusicCollectionListApp
 
             Startwatch();
 
-            CollectionOriginType collectionOriginType = CollectionOriginType.Lossless;
+
+            CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
+
 
             //==================================================================
+            //==================================================================
+            //==================================================================
             //Action 1 - Extract tree folder/files and save result in text file
+            //==================================================================
+            //==================================================================
             //==================================================================
 
 
@@ -47,7 +55,7 @@ namespace MusicCollectionListApp
             //
             //TOP 1 - BEST HIGH PERFORMANCE
             //-------------------------------------------------------------
-             var msDosShellHelper = new MsDosShellHelper();
+            var msDosShellHelper = new MsDosShellHelper();
             //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
             msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
             //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
@@ -94,12 +102,16 @@ namespace MusicCollectionListApp
             //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
+            //==================================================================
+            //==================================================================
             //===================================================================
             //Action 2 - Transform text file from previous step to csv file
             //and add  prefix 'absolute fullFolder' to line and column extension
             //columns separated by 'fieldSeparator' char
             //output format: absolute fullFileName ; extencion
             //output can be upload to Access and make queries
+            //==================================================================
+            //==================================================================
             //===================================================================
 
             //---------------------------------------------------------------------
@@ -107,15 +119,18 @@ namespace MusicCollectionListApp
             //filesTransformer.FlatToCSV(collectionOriginType);
             //---------------------------------------------------------------------
 
-
+            //==================================================================
+            //==================================================================
             //===================================================================
             //Action 3 - input file must have only Folders
             // FileSystemContextFilter.DirectoriesOnly
-           //===================================================================
+            //===================================================================
+            //==================================================================
+            //==================================================================
 
-           //---------------------------------------------------------------------
-           ValidateCollectionAction validateCollection = new();
-            validateCollection.ValidateFoldersRulesFromSequencialFileResult(collectionOriginType);
+            //---------------------------------------------------------------------
+            ValidateCollectionAction validateCollection = new();
+           validateCollection.ValidateFoldersRulesFromLinearFormatedFile(collectionOriginType);
             //---------------------------------------------------------------------
 
             //////////////////////////////////////////
@@ -167,5 +182,7 @@ namespace MusicCollectionListApp
             
             Log.Information("Stopwatch Stopped...");
         }
+
+
     }
 }

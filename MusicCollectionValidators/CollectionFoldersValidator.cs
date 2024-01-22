@@ -313,18 +313,26 @@ namespace MusicCollectionValidators
             return count;
         }
 
-        private int CountDuplicateSpaces()
+        private int CountMaxDuplicateSpaces()
         {
+            //char[] _data = data.ToCharArray();
+
             int count = 0;
+            int maxFound = 0;
+
             foreach (char c in _data)
             {
                 if (c == ' ')
                     count++;
                 else
+                {
+                    if (count > maxFound)
+                        maxFound = count;
                     count = 0;
+                }
             }
 
-            return count;
+            return maxFound;
         }
 
     }

@@ -164,7 +164,7 @@ namespace MusicCollectionSystemIO
 
             foreach (string subdirectory in subdirectoryEntries)
             {
-                DirectoryInfo directoryInfo = new(subdirectory);
+                //DirectoryInfo directoryInfo = new(subdirectory);
 
                 LoadSubDirectories(subdirectory);
                 LoadFiles(subdirectory);

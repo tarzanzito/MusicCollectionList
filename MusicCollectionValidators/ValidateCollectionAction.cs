@@ -15,7 +15,7 @@ namespace MusicCollectionValidators
         StreamReader _reader;
         CollectionFoldersValidator _validator;
 
-        public void ValidateFoldersRulesFromSequencialFileResult(CollectionOriginType collectionOriginType)
+        public void ValidateFoldersRulesFromLinearFormatedFile(CollectionOriginType collectionOriginType)
         {
             try
             {

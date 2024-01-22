@@ -6,8 +6,8 @@ namespace MusicCollectionContext
     {
         public static readonly System.Text.Encoding StreamsEncoding = System.Text.Encoding.UTF8;
 
-        //public const string FolderRootCollectionLoss = @"\\NAS-QNAP\music\_COLLECTION\";
-        public const string FolderRootCollectionLoss = @"\\NAS-SYNOLOGY\music\_COLLECTION\";
+        public const string FolderRootCollectionLoss = @"\\NAS-QNAP\music\_COLLECTION\";
+        //public const string FolderRootCollectionLoss = @"\\NAS-SYNOLOGY\music\_COLLECTION\";
         
         public const string FolderRootCollectionLossLess = @"\\NAS-QNAP\music_lossless\_COLLECTION\";
         //public const string FolderRootCollectionLossLess = @"\\NAS-SYNOLOGY\music_lossless\_COLLECTION\";
