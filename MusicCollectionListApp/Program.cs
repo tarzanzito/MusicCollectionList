@@ -38,6 +38,7 @@ namespace MusicCollectionListApp
             Startwatch();
 
 
+            //Choose input Collection
             CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
 
 
@@ -66,7 +67,7 @@ namespace MusicCollectionListApp
             //
             //TOP 2 - MIDLE PERFORMANCE
             //-----------------------------------------------------
-             var powerShellHelper = new PowerShellHelper();
+            //var powerShellHelper = new PowerShellHelper();
 
             //V1 - using powershell pipeline
             //powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.All, true, true);
@@ -86,7 +87,7 @@ namespace MusicCollectionListApp
 
             // via C# extract treefolder/files and save result 3 in text file (Artists, Albums and tracks
             
-            var systemIOShellHelper = new SystemIOShellHelper();
+            //var systemIOShellHelper = new SystemIOShellHelper();
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true);
             //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true);
 
@@ -96,7 +97,7 @@ namespace MusicCollectionListApp
             //
             //TOP 1 - BEST HIGH PERFORMANCE
             //--------------------------------------------------------------------
-             var linuxShellHelper = new LinuxShellHelper();
+            //var linuxShellHelper = new LinuxShellHelper();
             //linuxShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
             //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
             //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
@@ -182,7 +183,6 @@ namespace MusicCollectionListApp
             
             Log.Information("Stopwatch Stopped...");
         }
-
 
     }
 }

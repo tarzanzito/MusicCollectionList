@@ -195,7 +195,6 @@ namespace MusicCollectionValidators
             return new CollectionFoldersValidatorResult(CollectionFolderType.Ok, "");
         }
 
-
         private CollectionFoldersValidatorResult ValidateAlbumFolderRules()
         {
             //required formats

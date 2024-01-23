@@ -15,6 +15,10 @@ namespace MusicCollectionValidators
         StreamReader _reader;
         CollectionFoldersValidator _validator;
 
+        //input line: example
+        //\\NAS-QNAP\music\_COLLECTION\A\
+        //\\NAS-QNAP\music\_COLLECTION\I\I And Thou {United States}\
+        //\\NAS-QNAP\music\_COLLECTION\I\I And Thou {United States}\I And Thou {2912} [Speak] @MP3\
         public void ValidateFoldersRulesFromLinearFormatedFile(CollectionOriginType collectionOriginType)
         {
             try
@@ -82,7 +86,7 @@ namespace MusicCollectionValidators
         }
 
         private void ValidateLine(string line)
-            {
+        {
             string temp = line.Replace(_rootPath, "");
 
             string[] words = temp.Split(Path.DirectorySeparatorChar);
@@ -108,6 +112,6 @@ namespace MusicCollectionValidators
             }
         }
 
-   }
+    }
 }
 
