@@ -212,7 +212,6 @@ namespace MusicCollectionPowerShell
                 {
                     _writer.Flush();
                     _writer.Close();
-                    _writer.Dispose();
                 }
             }
 
@@ -512,13 +511,11 @@ namespace MusicCollectionPowerShell
                 if (_reader != null)
                 {
                     _reader.Close();
-                    _reader.Dispose();
                 }
                 if (_writer != null)
                 {
                     _writer.Flush();
                     _writer.Close();
-                    _writer.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "PowerShellHelper", "ChangeOutputToLinearFormat");

@@ -10,8 +10,6 @@ using MusicCollectionPowerShell;
 using MusicCollectionActions;
 using MusicCollectionValidators;
 using MusicCollectionLinux;
-using System.Drawing.Drawing2D;
-using System.Xml.Linq;
 
 //via dotnet command
 //dotnet add package Microsoft.PowerShell.SDK
@@ -35,21 +33,35 @@ namespace MusicCollectionListApp
 
             Log.Information("App Started...");
 
-            Startwatch();
-
 
             //Choose input Collection
             CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
 
+            //Action 1 - Extract folder tree from OS
+            ExtractFoldersTree(collectionOriginType);
 
-            //==================================================================
-            //==================================================================
-            //==================================================================
-            //Action 1 - Extract tree folder/files and save result in text file
-            //==================================================================
-            //==================================================================
-            //==================================================================
+            //Action 2 - Transform text file from previous step to csv file
+            TransformFlatFileToStandardCsv(collectionOriginType);
 
+            //Action 3 - Validate Path rules (input file must have only Folders)
+            ValidateCollectionOriginType(collectionOriginType);
+
+
+            Log.Information("Finished...");
+
+            Log.Information("Enter ...");
+            Console.ReadKey();
+
+            return 0;
+        }
+
+        private static bool ExtractFoldersTree(CollectionOriginType collectionOriginType)
+        {
+            Startwatch("ExtractFoldersTree");
+
+            FileSystemContextFilter fileSystemContextFilter = FileSystemContextFilter.DirectoriesOnly;
+
+            bool result = false;
 
             //-------------------------------------------------------------
             //Option 1 - Extractor Files and Folder via (CMD / DOS command)
@@ -57,94 +69,79 @@ namespace MusicCollectionListApp
             //TOP 1 - BEST HIGH PERFORMANCE
             //-------------------------------------------------------------
             var msDosShellHelper = new MsDosShellHelper();
-            //msDosShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
-            msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
-            //msDosShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
-
+            result = msDosShellHelper.TreeProcess(collectionOriginType, fileSystemContextFilter, true, true);
 
             //-----------------------------------------------------
-            //Option 2- Extractor Files and Folder via (PowerShell)
+            //Option 2 - Extractor Files and Folder via (PowerShell)
             //
-            //TOP 2 - MIDLE PERFORMANCE
+            //TOP 2 - MIDDLE PERFORMANCE
             //-----------------------------------------------------
             //var powerShellHelper = new PowerShellHelper();
 
             //V1 - using powershell pipeline
-            //powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //powerShellHelper.TreeProcessUsingPipeline(collectionOriginType, fileSystemContextFilter, true, true);
 
             //V2 - using powershell string command
-            //powerShellHelper.TreeProcessUsingCommand(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //powerShellHelper.TreeProcessUsingCommand(collectionOriginType, fileSystemContextFilter, true, true);
 
             //V3 -using powershell execute script
-            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, FileSystemContextFilter.All, true, true);
+            //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, fileSystemContextFilter, true, true);
 
 
-            //--------------------------------------------------------------------------------------------
-            //Option 3- Extractor Files and Folder via (C#) , Directory.GetDirectories, Directory.GetFiles
+            //-----------------------------------------------------------------------------------------------
+            //Option 3 - Extractor Files and Folder via (C#) , Directory.GetDirectories, Directory.GetFiles
             //
             //TOP 3 - LOW PERFORMANCE
-            //--------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------
 
-            // via C# extract treefolder/files and save result 3 in text file (Artists, Albums and tracks
-            
             //var systemIOShellHelper = new SystemIOShellHelper();
-            //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true);
-            //systemIOShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true);
+            //systemIOShellHelper.TreeProcess(collectionOriginType, fileSystemContextFilter, true);
 
 
-            //-------------------------------------------------------------------
+            //---------------------------------------------------------------------
             //Option 4 - Extractor Files and Folder via (LINUX bash / ls command)
             //
             //TOP 1 - BEST HIGH PERFORMANCE
-            //--------------------------------------------------------------------
-            //var linuxShellHelper = new LinuxShellHelper();
+            //---------------------------------------------------------------------
+            //var linuxShellHelper = new LinuxShellHelper();     FileSystemContextFilter
             //linuxShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
-            //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.DirectoriesOnly, true, true);
-            //linuxShellHelper.TreeProcess(collectionOriginType, FileSystemContextFilter.All, true, true);
 
 
-            //==================================================================
-            //==================================================================
-            //===================================================================
-            //Action 2 - Transform text file from previous step to csv file
-            //and add  prefix 'absolute fullFolder' to line and column extension
-            //columns separated by 'fieldSeparator' char
-            //output format: absolute fullFileName ; extencion
-            //output can be upload to Access and make queries
-            //==================================================================
-            //==================================================================
-            //===================================================================
+            Stopwatch("ExtractFoldersTree");
 
-            //---------------------------------------------------------------------
+            return result;
+        }
+
+        private static void TransformFlatFileToStandardCsv(CollectionOriginType collectionOriginType)
+        {
+            Startwatch("TransformFlatFileToStandardCsv");
+
+            //Transform text file from previous step to csv file
+            //  and add  prefix 'absolute fullFolder' to line and column extension
+            //  columns separated by 'fieldSeparator' char
+            //  output format: absolute fullFileName ; extencion
+            //  output can be upload to Access and make queries
+
             FilesTransformer filesTransformer = new();
-            //filesTransformer.FlatToCSV(collectionOriginType);
-            //---------------------------------------------------------------------
+            filesTransformer.FlatToCSV(collectionOriginType, false);
 
-            //==================================================================
-            //==================================================================
-            //===================================================================
-            //Action 3 - input file must have only Folders
+            Stopwatch("TransformFlatFileToStandardCsv");
+        }
+
+        private static void ValidateCollectionOriginType(CollectionOriginType collectionOriginType)
+        {
+            Startwatch("ValidateCollectionOriginType");
+
+            //Note: input file must have only Folders
             // FileSystemContextFilter.DirectoriesOnly
-            //===================================================================
-            //==================================================================
-            //==================================================================
+            //Validate folders formats
+            //  Artist : ArtistName {countryName}
+            //  Album  : ArtistName {year} [AlbumName] @FLAC (or @MP3) 
 
-            //---------------------------------------------------------------------
             ValidateCollectionAction validateCollection = new();
-           validateCollection.ValidateFoldersRulesFromLinearFormatedFile(collectionOriginType);
-            //---------------------------------------------------------------------
+            validateCollection.ValidateFoldersRulesFromLinearFormatedFile(collectionOriginType);
 
-            //////////////////////////////////////////
-
-            Stopwatch();
-
-            Debug.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
-            Console.WriteLine($"Elapsed: {_watch.ElapsedMilliseconds}");
-            Log.Warning($"Elapsed: {_watch.ElapsedMilliseconds}");
-
-            Log.Information("Finished...");
-
-            return 0;
+            Stopwatch("ValidateCollectionOriginType");
         }
 
         private static void StartLogger()
@@ -167,22 +164,21 @@ namespace MusicCollectionListApp
             Log.Information($"LogFile:{logFileFullName}");
         }
 
-        private static void Startwatch()
+        private static void Startwatch(string msg)
         {
-            Log.Information("Stopwatch Started...");
+            Log.Information($"Stopwatch Started... - {msg}");
 
             _watch = new Stopwatch();
             _watch.Start();
         }
 
-        private static void Stopwatch()
+        private static void Stopwatch(string msg)
         {
             _watch.Stop();
 
             Log.Information($"Elapsed: {_watch.ElapsedMilliseconds}");
             
-            Log.Information("Stopwatch Stopped...");
+            Log.Information($"Stopwatch Stopped... {msg}");
         }
-
     }
 }

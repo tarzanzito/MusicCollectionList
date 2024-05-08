@@ -105,7 +105,6 @@ namespace MusicCollectionSystemIO
                 //{
                 //    _streamWriter.Flush();
                 //    _streamWriter.Close();
-                //    _streamWriter.Dispose();
                 //}
             }
 

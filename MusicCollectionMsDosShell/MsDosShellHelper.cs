@@ -37,9 +37,11 @@ namespace MusicCollectionMsDos
         /// <param name="applyExtensionsFilter"></param>
         /// <param name="setToLinearOutputFormat"></param>
         /// 
-        public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
+        public bool TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
             Log.Information("'MusicCollectionMsDos.TreeProcess' - Started...");
+            
+            bool resultOk = false;
 
             try
             {
@@ -74,7 +76,7 @@ namespace MusicCollectionMsDos
                 if (!Directory.Exists(rootPath))
                 {
                     Log.Error($"Folder Root not exists=[{rootPath}");
-                    return;
+                    return false;
                 }
 
                 if (!setToLinearOutputFormat)
@@ -107,7 +109,7 @@ namespace MusicCollectionMsDos
                 Log.Information($"MS-DOS Command:[{msDosCommand}]");
 
                 //process 
-                bool resultOk = MsDosProcess(msDosCommand);
+                resultOk = MsDosProcess(msDosCommand);
 
                 if (resultOk && setToLinearOutputFormat)
                     ChangeOutputToLinearFormat();
@@ -115,11 +117,14 @@ namespace MusicCollectionMsDos
             catch (Exception ex)
             {
                 Log.Error($"ERROR EXCEPTION: {ex.Message}");
+                resultOk = false;
             }
             finally
             {
                 Log.Information("'MusicCollectionMsDos.TreeProcess' - Finished...");
             }
+
+            return resultOk;
         }
 
         private bool MsDosProcess(string msDosCommand)
@@ -190,7 +195,6 @@ namespace MusicCollectionMsDos
                 {
                     _streamWriter.Flush();
                     _streamWriter.Close();
-                    _streamWriter.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
@@ -329,13 +333,11 @@ namespace MusicCollectionMsDos
                 if (_streamReader != null)
                 {
                     _streamReader.Close();
-                    _streamReader.Dispose();
                 }
                 if (_streamWriter != null)
                 {
                     _streamWriter.Flush();
                     _streamWriter.Close();
-                    _streamWriter.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");

@@ -74,7 +74,6 @@ namespace MusicCollectionList
                 if (reader != null)
                 {
                     reader.Close();
-                    reader.Dispose();
                 }
             }
 

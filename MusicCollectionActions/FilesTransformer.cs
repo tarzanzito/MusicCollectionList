@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using MusicCollectionContext;
+using Serilog;
 
 namespace MusicCollectionActions
 {
@@ -24,6 +25,8 @@ namespace MusicCollectionActions
         /// 
         public void FlatToCSV(CollectionOriginType collectionOriginType, bool onlyMusicFiles)
         {
+            Log.Information("FlatToCSV started...");
+
             string rootFolder;
             string fullFileNameIn;
             string fullFileNameOut;
@@ -41,6 +44,10 @@ namespace MusicCollectionActions
                 fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLossLess);
             }
 
+            Log.Information($"rootFolder={rootFolder}");
+            Log.Information($"fullFileNameIn={fullFileNameIn}");
+            Log.Information($"fullFileNameOut={fullFileNameOut}");
+                
             try
             {
                 if (!File.Exists(fullFileNameIn))
@@ -71,12 +78,12 @@ namespace MusicCollectionActions
                     }
                 }
 
-                Console.WriteLine(_count);
+                Log.Information($"FlatToCSV Count={_count}");
             }
 
             catch (Exception exp)
             {
-                Console.WriteLine(exp.Message);
+                Log.Error($"FlatToCSV Error={exp.Message}");
             }
             finally
             {
@@ -84,6 +91,7 @@ namespace MusicCollectionActions
                 _streamWriter.Close();
             }
 
+            Log.Information("FlatToCSV Finished...");
         }
     }
 }

@@ -88,7 +88,6 @@ namespace MusicCollectionSystemIO
                 {
                     _streamWriter.Flush();
                     _streamWriter.Close();
-                    _streamWriter.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "SystemIOShellHelper", "TreeProcess");

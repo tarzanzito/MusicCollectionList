@@ -21,12 +21,14 @@ namespace MusicCollectionValidators
         //\\NAS-QNAP\music\_COLLECTION\I\I And Thou {United States}\I And Thou {2912} [Speak] @MP3\
         public void ValidateFoldersRulesFromLinearFormatedFile(CollectionOriginType collectionOriginType)
         {
+            Log.Information("ValidateFoldersRulesFromLinearFormatedFile: Started...");
+
             try
             {
                 PrepareVariables(collectionOriginType);
 
-                Log.Information(_fileNameIn);
-                Log.Information(_fileNameError);
+                Log.Information($"fileNameIn={ _fileNameIn}");
+                Log.Information($"fileNameError={_fileNameError}");
 
                 _validator = new CollectionFoldersValidator(collectionOriginType);
 
@@ -55,15 +57,15 @@ namespace MusicCollectionValidators
                 if (_reader != null)
                 {
                     _reader.Close();
-                    _reader.Dispose();
                 }
                 if (_writer != null)
                 {
                     _writer.Flush();
                     _writer.Close();
-                    _writer.Dispose();
                 }
             }
+
+            Log.Information("ValidateFoldersRulesFromLinearFormatedFile: Finished...");
         }
 
         private void PrepareVariables(CollectionOriginType collectionOriginType)
@@ -91,9 +93,11 @@ namespace MusicCollectionValidators
 
             string[] words = temp.Split(Path.DirectorySeparatorChar);
 
+            string letter = words[0];
+
             foreach (string item in words)
             {
-                CollectionFoldersValidatorResult result = _validator.ValidateFolder(item);
+                CollectionFoldersValidatorResult result = _validator.ValidateFolder(item, letter);
 
                 if (result.CollectionFolderType == CollectionFolderType.None)
                     continue;

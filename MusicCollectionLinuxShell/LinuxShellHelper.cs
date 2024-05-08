@@ -154,7 +154,6 @@ namespace MusicCollectionLinux
                 {
                     _streamWriter.Flush();
                     _streamWriter.Close();
-                    _streamWriter.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "LinuxShellHelper", "LinuxBashProcess");
@@ -307,13 +306,11 @@ namespace MusicCollectionLinux
                 if (_streamReader != null)
                 {
                     _streamReader.Close();
-                    _streamReader.Dispose();
                 }
                 if (_streamWriter != null)
                 {
                     _streamWriter.Flush();
                     _streamWriter.Close();
-                    _streamWriter.Dispose();
                 }
             }
 
