@@ -10,7 +10,6 @@ namespace MusicCollectionValidators
         Artist,
         Album,
         MaybeArtistOrAlbum,
-        IncorrectFormat,
-        FirstLetter
+        IncorrectFormat
     }
 }
