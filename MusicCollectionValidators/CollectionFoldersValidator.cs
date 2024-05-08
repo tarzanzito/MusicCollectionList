@@ -1,6 +1,7 @@
 ﻿
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using MusicCollectionContext;
 
@@ -168,14 +169,16 @@ namespace MusicCollectionValidators
 
         private bool ValidateFirstLetter(string path, string letter)
         {
-            if (letter != "#")
-            {
-                string first = path.Substring(0, 1).ToUpper();
-                if (letter != first)
-                    return false;
-            }
+            if (letter == "#")
+                return true;
 
-            return true; 
+            string first = path.Substring(0, 1);
+            string firstD = DiacriticsUtil.RemoveDiacritics(first, DiacriticsUtil.TextCaseAction.ToUpper);
+
+            if (letter != firstD)
+                return false;
+
+            return true;
         }
 
         private CollectionFoldersValidatorResult ValidateArtistFolderRules(string path, string letter)
