@@ -19,13 +19,13 @@ namespace MusicCollectionContext
         internal static string RemoveDiacritics(string text, TextCaseAction textCaseAction)
         {
             if (string.IsNullOrEmpty(text))
-                return null;
+                return "";
 
             string normalizedString = text.Normalize(NormalizationForm.FormD);
 
-            StringBuilder stringBuilder = new StringBuilder(capacity: normalizedString.Length);
+            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
 
-            foreach (char letter in normalizedString)
+            foreach(char letter in normalizedString)
             {
                 var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(letter);
                 if (unicodeCategory != UnicodeCategory.NonSpacingMark)
@@ -35,7 +35,7 @@ namespace MusicCollectionContext
             string result = stringBuilder.ToString().Normalize(NormalizationForm.FormC);
 
             //extra
-            switch (textCaseAction)
+            switch(textCaseAction)
             {
                 case TextCaseAction.ToLower:
                     return result.ToLower();

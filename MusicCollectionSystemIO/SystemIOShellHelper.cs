@@ -8,9 +8,9 @@ namespace MusicCollectionSystemIO
 {
     public class SystemIOShellHelper
     {
-        private StreamWriter _streamWriter;
+        private StreamWriter? _streamWriter;
         private FileSystemContextFilter _contextFilter;
-        private string _extensionFilter;
+        private string _extensionFilter = string.Empty;
         private bool _applyExtensionsFilter;
 
         /// <summary>
@@ -98,6 +98,9 @@ namespace MusicCollectionSystemIO
 
         private void LoadDirectoryInfo(string directory)
         {
+            if (_streamWriter == null)
+                throw new Exception("_streamWriter is null");
+
             // Get all directories  
             string[] directoriesEntry = Directory.GetDirectories(directory);
 

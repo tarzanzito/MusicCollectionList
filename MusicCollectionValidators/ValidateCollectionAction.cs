@@ -8,12 +8,12 @@ namespace MusicCollectionValidators
 {
     public class ValidateCollectionAction
     {
-        string _rootPath;
-        string _fileNameIn;
-        string _fileNameError;
-        StreamWriter _writer;
-        StreamReader _reader;
-        CollectionFoldersValidator _validator;
+        string _rootPath = string.Empty;
+        string _fileNameIn = string.Empty;
+        string _fileNameError = string.Empty;
+        StreamWriter? _writer;
+        StreamReader? _reader;
+        CollectionFoldersValidator? _validator;
 
         //input line: example
         //\\NAS-QNAP\music\_COLLECTION\A\
@@ -27,7 +27,7 @@ namespace MusicCollectionValidators
             {
                 PrepareVariables(collectionOriginType);
 
-                Log.Information($"fileNameIn={ _fileNameIn}");
+                Log.Information($"fileNameIn={_fileNameIn}");
                 Log.Information($"fileNameError={_fileNameError}");
 
                 _validator = new CollectionFoldersValidator(collectionOriginType);
@@ -37,7 +37,7 @@ namespace MusicCollectionValidators
 
                 int count = 0;
 
-                string line;
+                string? line;
                 while ((line = _reader.ReadLine()) != null)
                 {
                     count++;
@@ -54,15 +54,10 @@ namespace MusicCollectionValidators
             }
             finally
             {
-                if (_reader != null)
-                {
-                    _reader.Close();
-                }
-                if (_writer != null)
-                {
-                    _writer.Flush();
-                    _writer.Close();
-                }
+                _reader?.Close();
+
+                _writer?.Flush();
+                _writer?.Close();
             }
 
             Log.Information("ValidateFoldersRulesFromLinearFormatedFile: Finished...");
@@ -89,6 +84,13 @@ namespace MusicCollectionValidators
 
         private void ValidateLine(string line)
         {
+            if (_writer == null)
+                throw new Exception("_writer is null.");
+
+            if (_validator == null)
+                throw new Exception("_validator is null.");
+
+
             string temp = line.Replace(_rootPath, "");
 
             string[] words = temp.Split(Path.DirectorySeparatorChar);
@@ -97,7 +99,7 @@ namespace MusicCollectionValidators
 
             foreach (string item in words)
             {
-                CollectionFoldersValidatorResult result = _validator.ValidateFolder(item, letter);
+                CollectionFoldersValidatorResult result = _validator!.ValidateFolder(item, letter);
 
                 if (result.CollectionFolderType == CollectionFolderType.None)
                     continue;

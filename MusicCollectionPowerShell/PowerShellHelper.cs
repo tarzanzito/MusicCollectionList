@@ -31,15 +31,15 @@ namespace MusicCollectionPowerShell
 
     public class PowerShellHelper
     {
-        private string _rootPath;
-        private string _fullFileNameTemp;
-        private string _fullFileNameOut;
+        private string _rootPath = string.Empty;
+        private string _fullFileNameTemp = string.Empty;
+        private string _fullFileNameOut = string.Empty;
         private FileSystemContextFilter _contextFilter;
-        private string _extensionFilter;
-        private string[] _extensionFilterArray;
+        private string _extensionFilter = string.Empty;
+        private string[] _extensionFilterArray = [];
         private bool _applyExtensionsFilter;
-        private StreamReader _reader;
-        private StreamWriter _writer;
+        private StreamReader? _reader;
+        private StreamWriter? _writer;
 
         //////////////////////////////////////////////////
         //Create text file with tree files and directories
@@ -56,8 +56,8 @@ namespace MusicCollectionPowerShell
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
 
-            Runspace runspace = null;
-            Pipeline pipeline = null;
+            Runspace? runspace = null;
+            Pipeline? pipeline = null;
 
             try
             {
@@ -144,7 +144,7 @@ namespace MusicCollectionPowerShell
         {
             Log.Information("'PowerShellHelper.TreeProcessUsingCommand' - Started...");
 
-            PowerShell powerShell = null;
+            PowerShell? powerShell = null;
 
             try
             {
@@ -203,16 +203,13 @@ namespace MusicCollectionPowerShell
             }
             finally
             {
-                if (powerShell != null)
+                //if (powerShell != null)
                 {
-                    powerShell.Stop();
-                    powerShell.Dispose();
+                    powerShell?.Stop();
+                    powerShell?.Dispose();
                 }
-                if (_writer != null)
-                {
-                    _writer.Flush();
-                    _writer.Close();
-                }
+                    _writer?.Flush();
+                    _writer?.Close();
             }
 
             Log.Information("'PowerShellHelper.TreeProcessUsingCommand' - Finish...");
@@ -223,7 +220,7 @@ namespace MusicCollectionPowerShell
         {
             Log.Information("'PowerShellHelper.TreeProcessUsingScriptString' - Started...");
 
-            PowerShell powerShell = null;
+            PowerShell? powerShell = null;
 
             try
             {
@@ -262,7 +259,7 @@ namespace MusicCollectionPowerShell
                 //"Get-ChildItem -LiteralPath 'C:\\Test' -Recurse -Name -File | Out-File 'c:\result.txt'";
                 //"Get-ChildItem -LiteralPath 'C:\\Test' -Filter '*.jpg' -Recurse -Name -File | Out-File 'c:\result.txt'";
                 //"Get-ChildItem -LiteralPath 'C:\\Test' -Include '*.jpg,*.mp3' -Recurse -Name -File | Out-File 'c:\result.txt'";
-                
+
                 //-name -> set outputlike 'liner format' but do not show difference between Directory and File
                 //string script = $"Get-ChildItem -LiteralPath '{_rootPath}' {extensionFilterPhrase} -Recurse -Name {sysContext} | Out-File '{_fullFileNameTemp}'";
                 string script = $"Get-ChildItem -LiteralPath '{_rootPath}' {extensionFilterPhrase} -Recurse {sysContext} | Out-File '{_fullFileNameTemp}'";
@@ -276,7 +273,7 @@ namespace MusicCollectionPowerShell
 
                 //RUN
                 Invoke(powerShell);
-                
+
                 if (setToLinearOutputFormat)
                     ChangeOutputToLinearFormat();
             }
@@ -287,11 +284,8 @@ namespace MusicCollectionPowerShell
             }
             finally
             {
-                if (powerShell != null)
-                {
-                    powerShell.Stop();
-                    powerShell.Dispose();
-                }
+                powerShell?.Stop();
+                powerShell?.Dispose();
             }
 
             Log.Information("'PowerShellHelper.TreeProcessUsingScriptString' - Finish...");
@@ -319,7 +313,7 @@ namespace MusicCollectionPowerShell
 
             _extensionFilter = _extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();
 
-            _extensionFilterArray = null;
+            _extensionFilterArray = [];
             if (_extensionFilter.Contains(','))
                 _extensionFilterArray = _extensionFilter.Split(",");
 
@@ -418,7 +412,7 @@ namespace MusicCollectionPowerShell
             Utils.Startwatch(stopwatch, "PowerShellHelper", "ChangeOutputToLinearFormat");
 
             int count = 0;
-            string line = "";
+            string? line = null;
 
             try
             {
@@ -508,15 +502,10 @@ namespace MusicCollectionPowerShell
             }
             finally
             {
-                if (_reader != null)
-                {
-                    _reader.Close();
-                }
-                if (_writer != null)
-                {
-                    _writer.Flush();
-                    _writer.Close();
-                }
+                _reader?.Close();
+
+                _writer?.Flush();
+                _writer?.Close();
 
                 Utils.Stopwatch(stopwatch, "PowerShellHelper", "ChangeOutputToLinearFormat");
 
@@ -560,8 +549,8 @@ namespace MusicCollectionPowerShell
             //write
             if (isValid)
             {
-                _writer.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{member}{dirMark}");
-                _writer.Flush();
+                _writer?.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{member}{dirMark}");
+                _writer?.Flush();
             }
         }
     }

@@ -2,7 +2,6 @@
 
 using Serilog;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace MusicCollectionContext
 {

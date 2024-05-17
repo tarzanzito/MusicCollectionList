@@ -1,9 +1,15 @@
-﻿using System.Globalization;
+﻿using System.Drawing;
+using System;
+using System.Globalization;
+using System.IO;
 using System.Text;
-
-
 namespace MusicCollectionValidators
 {
+    //Portugal
+    //Diacrítico - Um diacrítico é um sinal gráfico que se coloca sobre,
+    //sob ou através de uma letra para alterar a sua realização fonética,
+    //isto é, o seu som, ou para marcar qualquer outra característica linguística.
+    //São exemplos: acento agudo, acento grave, acento circunflexo, trema, til, mácron, caron, braquia.
     internal class DiacriticsUtil
     {
         internal enum TextCaseAction
@@ -13,16 +19,19 @@ namespace MusicCollectionValidators
             ToUpper
         }
 
-        //remoção de chars diacríticos (example ç ó õ )
-        //stripping diacritics
-
+        //
+        //replace chars like á, à, ã, â -> a 
+        //replace chars like é, è, ê    -> e
+        //etc
+        //
+        //diacritics
+        //
         internal static string RemoveDiacritics(string text, TextCaseAction textCaseAction)
         {
             if (string.IsNullOrEmpty(text))
-                return null;
+                return "";
 
             string normalizedString = text.Normalize(NormalizationForm.FormD);
-
             StringBuilder stringBuilder = new StringBuilder(capacity: normalizedString.Length);
 
             foreach (char letter in normalizedString)

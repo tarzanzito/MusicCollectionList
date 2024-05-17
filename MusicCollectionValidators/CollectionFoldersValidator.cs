@@ -10,7 +10,7 @@ namespace MusicCollectionValidators
     internal class CollectionFoldersValidator
     {
         //private string _path;
-        private readonly string _mediaFormatTags;
+        private readonly string _mediaFormatTags = string.Empty;
 
         //constructor
         public CollectionFoldersValidator(CollectionOriginType collectionOriginType)
@@ -24,7 +24,7 @@ namespace MusicCollectionValidators
 
         public CollectionFoldersValidatorResult ValidateFolder(string path, string letter)
         {
-            CollectionFoldersValidatorResult result = null;
+            CollectionFoldersValidatorResult? result = null;
 
             try
             {
@@ -205,7 +205,7 @@ namespace MusicCollectionValidators
                 return new CollectionFoldersValidatorResult(CollectionFolderType.IncorrectFormat, $"Artist: One space after '{Constants.COUNTRY_OPEN_TAG}' found");
 
             //contents
-            char[] chrs = { Constants.COUNTRY_OPEN_TAG, Constants.COUNTRY_CLOSE_TAG };
+            char[] chrs = [ Constants.COUNTRY_OPEN_TAG, Constants.COUNTRY_CLOSE_TAG ];
             string[] words = path.Split(chrs);
 
             if (words[0].Trim() == "")
@@ -295,7 +295,7 @@ namespace MusicCollectionValidators
 
             //contents
 
-            char[] chrs = { Constants.YEAR_OPEN_TAG, Constants.YEAR_CLOSE_TAG, Constants.ALBUM_OPEN_TAG, Constants.ALBUM_CLOSE_TAG };
+            char[] chrs = [ Constants.YEAR_OPEN_TAG, Constants.YEAR_CLOSE_TAG, Constants.ALBUM_OPEN_TAG, Constants.ALBUM_CLOSE_TAG ];
             string[] words = path.Split(chrs);
 
             if (words.Length != 5)

@@ -9,18 +9,19 @@ namespace MusicCollectionLinux
 {
     public class LinuxShellHelper
     {
-        private string _rootPath;
-        private string _fullFileNameOut;
-        private string _fullFileNameTemp;
+        private string _rootPath = string.Empty;
+        private string _fullFileNameOut = string.Empty;
+        private string _fullFileNameTemp = string.Empty;
         private FileSystemContextFilter _contextFilter;
-        private string _extensionFilter;
+        private string _extensionFilter = string.Empty;
         private bool _applyExtensionsFilter;
-        private StreamReader _streamReader;
-        private StreamWriter _streamWriter;
+        private StreamReader? _streamReader;
+        private StreamWriter? _streamWriter;
 
         public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
             Log.Information("'LinuxShellHelper.TreeProcess' - Started...");
+
             try
             {
                 _contextFilter = contextFilter;
@@ -77,12 +78,18 @@ namespace MusicCollectionLinux
 
         private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (_streamWriter == null)
+                return;
+
             _streamWriter.WriteLine("ERROR:" + e.Data);
             _streamWriter.Flush();
         }
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (_streamWriter == null)
+                return;
+
             _streamWriter.WriteLine(e.Data);
             _streamWriter.Flush();
         }
@@ -102,7 +109,7 @@ namespace MusicCollectionLinux
                 _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
 
                 //Process Info
-                ProcessStartInfo startInfo = new();
+                var startInfo = new ProcessStartInfo();
                 startInfo.FileName = "/bin/bash";
                 startInfo.Arguments = $"-c \"{bashCommand}\"";
 
@@ -192,7 +199,7 @@ namespace MusicCollectionLinux
             _streamReader = null;
              _streamWriter = null;
 
-            string line = "";
+            string? line = null;
 
             try
             {
@@ -297,7 +304,8 @@ namespace MusicCollectionLinux
             }
             catch (Exception ex)
             {
-                Log.Error($"Line:{line}");
+                if (line != null)
+                    Log.Error($"Line:{line}");
                 Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
             }

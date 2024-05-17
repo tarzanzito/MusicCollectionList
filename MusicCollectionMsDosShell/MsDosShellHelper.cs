@@ -10,12 +10,12 @@ namespace MusicCollectionMsDos
 {
     public class MsDosShellHelper
     {
-        private StreamReader _streamReader;
-        private StreamWriter _streamWriter;
-        private string _fullFileNameTemp;
-        private string _fullFileNameOut;
+        private StreamReader? _streamReader;
+        private StreamWriter? _streamWriter;
+        private string _fullFileNameTemp = string.Empty;
+        private string _fullFileNameOut = string.Empty;
         private FileSystemContextFilter _contextFilter;
-        private string _extensionFilter;
+        private string _extensionFilter = string.Empty;
         private bool _applyExtensionsFilter;
 
 
@@ -142,7 +142,7 @@ namespace MusicCollectionMsDos
                 _streamWriter = new StreamWriter(_fullFileNameTemp, false, Constants.StreamsEncoding);
 
                 //Process Info
-                ProcessStartInfo startInfo = new();
+                var startInfo = new ProcessStartInfo();
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = $"/C {msDosCommand}";
 
@@ -207,12 +207,18 @@ namespace MusicCollectionMsDos
 
         private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (_streamWriter == null)
+                return;
+
             _streamWriter.WriteLine("ERROR:" + e.Data);
             _streamWriter.Flush();
         }
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
+            if (_streamWriter == null)
+                return;
+
             _streamWriter.WriteLine(e.Data);
             _streamWriter.Flush();
         }
@@ -237,7 +243,7 @@ namespace MusicCollectionMsDos
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 
             int count = 0;
-            string line = "";
+            string? line = null;
 
             try
             {
@@ -300,7 +306,7 @@ namespace MusicCollectionMsDos
                         dirMark = Path.DirectorySeparatorChar;
                         isValid = true;
                     }
-                   else
+                    else
                     {
                         //verify Extensions Filter
                         if (_applyExtensionsFilter)
@@ -324,21 +330,16 @@ namespace MusicCollectionMsDos
             }
             catch (Exception ex)
             {
-                Log.Error($"Line:{line}");
+                if (line != null)
+                    Log.Error($"Line:{line}");
                 Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
             }
             finally
             {
-                if (_streamReader != null)
-                {
-                    _streamReader.Close();
-                }
-                if (_streamWriter != null)
-                {
-                    _streamWriter.Flush();
-                    _streamWriter.Close();
-                }
+                _streamReader?.Close();
+                _streamWriter?.Flush();
+                _streamWriter?.Close();
 
                 Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 

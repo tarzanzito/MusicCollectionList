@@ -10,8 +10,8 @@ namespace MusicCollectionActions
 
     public class FilesTransformer
     {
-        private StreamReader _streamReader;
-        private StreamWriter _streamWriter;
+        private StreamReader? _streamReader;
+        private StreamWriter? _streamWriter;
         private int _count = 0;
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace MusicCollectionActions
             Log.Information($"rootFolder={rootFolder}");
             Log.Information($"fullFileNameIn={fullFileNameIn}");
             Log.Information($"fullFileNameOut={fullFileNameOut}");
-                
+
             try
             {
                 if (!File.Exists(fullFileNameIn))
@@ -56,7 +56,7 @@ namespace MusicCollectionActions
                 _streamReader = new StreamReader(fullFileNameIn, Constants.StreamsEncoding);
                 _streamWriter = new StreamWriter(fullFileNameOut, false, Constants.StreamsEncoding);
 
-                string line;
+                string? line;
                 bool isValidFile = true;
                 while ((line = _streamReader.ReadLine()) != null)
                 {
@@ -71,7 +71,7 @@ namespace MusicCollectionActions
 
                     if (isValidFile)
                     {
-                        
+
                         _streamWriter.WriteLine(rootFolder + line + Constants.FieldSeparator + extension);
                         _streamWriter.Flush();
                         _count++;
@@ -87,8 +87,8 @@ namespace MusicCollectionActions
             }
             finally
             {
-                _streamReader.Close();
-                _streamWriter.Close();
+                _streamReader?.Close();
+                _streamWriter?.Close();
             }
 
             Log.Information("FlatToCSV Finished...");

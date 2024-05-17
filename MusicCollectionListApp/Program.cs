@@ -25,7 +25,7 @@ namespace MusicCollectionListApp
 {
     internal class Program
     {
-        private static Stopwatch _watch;
+        private static Stopwatch? _watch;
 
         public static int Main(string[] args)
         {
@@ -61,7 +61,7 @@ namespace MusicCollectionListApp
 
             FileSystemContextFilter fileSystemContextFilter = FileSystemContextFilter.DirectoriesOnly;
 
-            bool result = false;
+            bool result;
 
             //-------------------------------------------------------------
             //Option 1 - Extractor Files and Folder via (CMD / DOS command)
@@ -174,6 +174,9 @@ namespace MusicCollectionListApp
 
         private static void Stopwatch(string msg)
         {
+            if (_watch == null)
+                return;
+
             _watch.Stop();
 
             Log.Information($"Elapsed: {_watch.ElapsedMilliseconds}");

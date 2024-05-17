@@ -49,6 +49,4 @@ namespace MusicCollectionContext
         public const string MEDIA_FORMAT_TAG_LOSSLESS = "FLAC,APE,WAV,WV";
 
     }
-
-
 }
