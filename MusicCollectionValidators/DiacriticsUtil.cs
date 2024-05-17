@@ -32,7 +32,7 @@ namespace MusicCollectionValidators
                 return "";
 
             string normalizedString = text.Normalize(NormalizationForm.FormD);
-            StringBuilder stringBuilder = new StringBuilder(capacity: normalizedString.Length);
+            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
 
             foreach (char letter in normalizedString)
             {
