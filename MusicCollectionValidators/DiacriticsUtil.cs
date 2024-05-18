@@ -44,15 +44,28 @@ namespace MusicCollectionValidators
             string result = stringBuilder.ToString().Normalize(NormalizationForm.FormC);
 
             //extra
-            switch (textCaseAction)
+
+            string final = textCaseAction switch
             {
-                case TextCaseAction.ToLower:
-                    return result.ToLower();
-                case TextCaseAction.ToUpper:
-                    return result.ToUpper();
-                default:
-                    return result;
-            }
+                TextCaseAction.ToLower => result.ToLower(),
+                TextCaseAction.ToUpper => result.ToUpper(),
+                _ => result
+            };
+
+            //string final = string.Empty;
+            //switch (textCaseAction)
+            //{
+            //    case TextCaseAction.ToLower:
+            //        final = result.ToLower();
+            //        break;
+            //    case TextCaseAction.ToUpper:
+            //        final = result.ToUpper();
+            //        break 
+            //    default:
+            //        break;
+            //}
+
+            return final;
         }
     }
 }
