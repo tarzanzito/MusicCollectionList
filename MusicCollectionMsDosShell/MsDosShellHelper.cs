@@ -163,7 +163,7 @@ namespace MusicCollectionMsDos
                 process.OutputDataReceived += OutputDataReceived;
                 process.ErrorDataReceived += ErrorDataReceived;
 
-                //V2 - with lambdar (i dont like)
+                //V2 - with lambda (i dont like)
                 //process.OutputDataReceived += (sender, args) =>
                 //{
                 //    _streamWriter.WriteLine(args.Data);

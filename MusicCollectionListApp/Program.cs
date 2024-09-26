@@ -34,7 +34,7 @@ namespace MusicCollectionListApp
             Log.Information("App Started...");
 
 
-            //Choose input Collection
+            //CHOOSE input Collection
             CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
 
             //Action 1 - Extract folder tree from OS
