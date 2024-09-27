@@ -23,7 +23,7 @@ namespace MusicCollectionActions
         /// </summary>
         /// <param name="collectionOriginType"></param>
         /// 
-        public void FlatToCSV(CollectionOriginType collectionOriginType, bool onlyMusicFiles)
+        public void FlatToCSV(CollectionOriginType collectionOriginType, bool onlyMusicFiles, bool addExtensionColumn)
         {
             Log.Information("FlatToCSV started...");
 
@@ -64,19 +64,25 @@ namespace MusicCollectionActions
                 bool isValidFile = true;
                 while ((line = _streamReader.ReadLine()) != null)
                 {
-                    //add extinson column
-                    string extension = Path.GetExtension(line).Trim().ToUpper();
+                        //add extinson column
+                        string extension = Path.GetExtension(line).Trim().ToUpper();
 
-                    if (extension.Length > 0)
-                        extension = extension.Substring(1);
+                        if (extension.Length > 0)
+                            extension = extension.Substring(1);
 
                     if (onlyMusicFiles)
                         isValidFile = Enum.IsDefined(typeof(MusicFileExtension), extension);
 
                     if (isValidFile)
                     {
+                        string newLine;
 
-                        _streamWriter.WriteLine(rootFolder + line + Constants.FieldSeparator + extension);
+                        if (addExtensionColumn)
+                            newLine = $"{rootFolder}{line}{Constants.FieldSeparator}{extension}";
+                        else
+                            newLine = $"{rootFolder}{line}";
+
+                        _streamWriter.WriteLine(newLine);
                         _streamWriter.Flush();
                         _count++;
                     }

@@ -37,15 +37,21 @@ namespace MusicCollectionListApp
             //CHOOSE here the input Collection
             CollectionOriginType collectionOriginType = CollectionOriginType.Lossless;
 
-            //Action 1 - Extract folder tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat)
-            ExtractFoldersTree(collectionOriginType);
+            //Action 1 - Extract ONLY folders tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat)
+            ExtractInfoFromOS(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
             //Action 2 - Transform text file from previous step to csv file (output '*.csv')
-            TransformFlatFileToStandardCsv(collectionOriginType);
+            TransformFlatFileToStandardCsv(collectionOriginType, false, true);
 
             //Action 3 - Validate Path rules (input file must have only Folders) (input '*.txt', output '*_ERROR.csv'.
             ValidateCollectionOriginType(collectionOriginType);
 
+            //////////////
+
+            //Action 4 - Extract ONLY files tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat)
+            RenameFiles(collectionOriginType, "D"); 
+            ExtractInfoFromOS(collectionOriginType, FileSystemContextFilter.FilesOnly);
+            TransformFlatFileToStandardCsv(collectionOriginType, false, true);
 
             Log.Information("Finished...");
 
@@ -55,11 +61,12 @@ namespace MusicCollectionListApp
             return 0;
         }
 
-        private static bool ExtractFoldersTree(CollectionOriginType collectionOriginType)
-        {
-            Startwatch("ExtractFoldersTree");
 
-            FileSystemContextFilter fileSystemContextFilter = FileSystemContextFilter.DirectoriesOnly;
+        private static bool ExtractInfoFromOS(CollectionOriginType collectionOriginType, FileSystemContextFilter fileSystemContextFilter, bool applyExtensionsFilter = false)
+        {
+            Startwatch("ExtractInfoFromOS");
+
+            //FileSystemContextFilter fileSystemContextFilter = FileSystemContextFilter.DirectoriesOnly;
 
             bool result;
 
@@ -69,7 +76,7 @@ namespace MusicCollectionListApp
             //TOP 1 - BEST HIGH PERFORMANCE
             //-------------------------------------------------------------
             var msDosShellHelper = new MsDosShellHelper();
-            result = msDosShellHelper.TreeProcess(collectionOriginType, fileSystemContextFilter, true, true);
+            result = msDosShellHelper.TreeProcess(collectionOriginType, fileSystemContextFilter, applyExtensionsFilter, true);
 
             //-----------------------------------------------------
             //Option 2 - Extractor Files and Folder via (PowerShell)
@@ -107,12 +114,12 @@ namespace MusicCollectionListApp
             //linuxShellHelper.TreeProcess(collectionOriginType, SystemElementsFilter.FilesOnly, true, true);
 
 
-            Stopwatch("ExtractFoldersTree");
+            Stopwatch("ExtractInfoFromOS");
 
             return result;
         }
 
-        private static void TransformFlatFileToStandardCsv(CollectionOriginType collectionOriginType)
+        private static void TransformFlatFileToStandardCsv(CollectionOriginType collectionOriginType, bool onlyMusicFiles, bool addExtensionColumn)
         {
             Startwatch("TransformFlatFileToStandardCsv");
 
@@ -123,7 +130,7 @@ namespace MusicCollectionListApp
             //  output can be upload to Access and make queries
 
             FilesTransformer filesTransformer = new();
-            filesTransformer.FlatToCSV(collectionOriginType, false);
+            filesTransformer.FlatToCSV(collectionOriginType, onlyMusicFiles, addExtensionColumn);
 
             Stopwatch("TransformFlatFileToStandardCsv");
         }
@@ -180,8 +187,48 @@ namespace MusicCollectionListApp
             _watch.Stop();
 
             Log.Information($"Elapsed: {_watch.ElapsedMilliseconds}");
-            
+
             Log.Information($"Stopwatch Stopped... {msg}");
+        }
+
+
+        private static void RenameFiles(CollectionOriginType collectionOriginType, string sufixName)
+        {
+            string rootPath = "";
+            string fullFileNameIn = "";
+            string fullFileNameOut = "";
+            string fullFileNameTempIn = "";
+            string fullFileNameTempOut = "";
+            string oldReplace = ".";
+            string newReplace = $"_{sufixName}.";
+
+            ////output files
+            switch (collectionOriginType)
+            {
+                case CollectionOriginType.Lossless:
+                    rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
+                    fullFileNameIn = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
+                    fullFileNameTempIn = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
+                    break;
+                case CollectionOriginType.Loss:
+                    rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
+                    fullFileNameIn = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
+                    fullFileNameTempIn = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
+                    break;
+                default:
+                    throw new Exception("CollectionOriginType error in 'MusicCollectionMsDos.TreeProcess')");
+            }
+
+            fullFileNameOut = fullFileNameIn.Replace(oldReplace, newReplace);
+            fullFileNameTempOut = fullFileNameTempIn.Replace(oldReplace, newReplace);
+
+            //renames
+            if (File.Exists(fullFileNameIn))
+                File.Move(fullFileNameIn, fullFileNameOut);
+
+            if (File.Exists(fullFileNameTempIn))
+                File.Move(fullFileNameTempIn, fullFileNameTempOut);
+
         }
     }
 }

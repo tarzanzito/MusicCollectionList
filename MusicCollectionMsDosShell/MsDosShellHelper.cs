@@ -263,7 +263,7 @@ namespace MusicCollectionMsDos
                 bool isValid = false;
                 string baseDir = "";
                 string item;
-                char dirMark;
+                char dirMark = Path.DirectorySeparatorChar;
 
                 while ((line = _streamReader.ReadLine()) != null)
                 {
@@ -306,8 +306,8 @@ namespace MusicCollectionMsDos
                     //Apply Extensions Filter
                     if (isFolder)
                     {
-                        //append 'DirectorySeparatorChar' at end
-                        dirMark = Path.DirectorySeparatorChar;
+                        //append 'DirectorySeparatorChar' at end (like linux)
+                        //dirMark = Path.DirectorySeparatorChar;
                         isValid = true;
                     }
                     else
@@ -318,13 +318,25 @@ namespace MusicCollectionMsDos
                             string extension = Path.GetExtension(item).ToUpper().Trim();
                             isValid = _extensionFilter.Contains(extension);
                         }
-                        dirMark = '\0';
+                        else
+                            isValid = true;
+
+                        //dirMark = ""; // '\0';
                     }
 
                     //write
                     if (isValid)
                     {
-                        _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
+                        string newLine = $"{baseDir}{Path.DirectorySeparatorChar}{item}";
+
+                        if (isFolder)
+                            line += dirMark;
+                        //if (isFolder)
+                        //     _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
+                        // else
+                        //     _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}");
+
+                        _streamWriter.WriteLine(newLine);
                         _streamWriter.Flush();
                     }
                 }
