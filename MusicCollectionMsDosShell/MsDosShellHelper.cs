@@ -51,21 +51,25 @@ namespace MusicCollectionMsDos
                 string rootPath;
 
                 //output files
-                if (collectionOriginType == CollectionOriginType.Loss)
+                switch (collectionOriginType)
                 {
-                    rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
-                    _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
-                    _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
-                    if (applyExtensionsFilter)
-                        _extensionFilter = Constants.FileExtensionsFilterLoss;
-                }
-                else
-                {
-                    rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
-                    _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
-                    _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
-                    if (applyExtensionsFilter)
-                        _extensionFilter = Constants.FileExtensionsFilterLossLess;
+                    case CollectionOriginType.Lossless:
+                        rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
+                        _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
+                        _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
+                        if (applyExtensionsFilter)
+                            _extensionFilter = Constants.FileExtensionsFilterLossLess;
+                        break;
+                    case CollectionOriginType.Loss:
+                        rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
+                        _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
+                        _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
+                        if (applyExtensionsFilter)
+                            _extensionFilter = Constants.FileExtensionsFilterLoss;
+
+                        break;
+                    default:
+                        throw new Exception("CollectionOriginType error in 'MusicCollectionMsDos.TreeProcess')");
                 }
 
                 _extensionFilter = _extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();

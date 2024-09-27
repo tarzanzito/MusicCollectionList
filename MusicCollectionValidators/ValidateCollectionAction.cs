@@ -65,17 +65,20 @@ namespace MusicCollectionValidators
 
         private void PrepareVariables(CollectionOriginType collectionOriginType)
         {
-            if (collectionOriginType == CollectionOriginType.Loss)
+            switch(collectionOriginType)
             {
-                _rootPath = Constants.FolderRootCollectionLoss;
-                _fileNameIn = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
-                _fileNameError = System.IO.Path.Join(_rootPath, Constants.FileErrorsLoss);
-            }
-            else
-            {
-                _rootPath = Constants.FolderRootCollectionLossLess;
-                _fileNameIn = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
-                _fileNameError = System.IO.Path.Join(_rootPath, Constants.FileErrorsLossLess);
+                case CollectionOriginType.Lossless:
+                    _rootPath = Constants.FolderRootCollectionLossLess;
+                    _fileNameIn = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLossLess);
+                    _fileNameError = System.IO.Path.Join(_rootPath, Constants.FileErrorsLossLess);
+                    break;
+                case CollectionOriginType.Loss:
+                    _rootPath = Constants.FolderRootCollectionLoss;
+                    _fileNameIn = System.IO.Path.Join(_rootPath, Constants.TreeTextFileNameCollectionLoss);
+                    _fileNameError = System.IO.Path.Join(_rootPath, Constants.FileErrorsLoss);
+                    break;
+                default:
+                    throw new Exception("CollectionOriginType error in 'ValidateFoldersRulesFromLinearFormatedFile.PrepareVariables')");
             }
 
             if (!File.Exists(_fileNameIn))

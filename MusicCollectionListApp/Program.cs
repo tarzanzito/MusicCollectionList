@@ -34,16 +34,16 @@ namespace MusicCollectionListApp
             Log.Information("App Started...");
 
 
-            //CHOOSE input Collection
-            CollectionOriginType collectionOriginType = CollectionOriginType.Loss;
+            //CHOOSE here the input Collection
+            CollectionOriginType collectionOriginType = CollectionOriginType.Lossless;
 
-            //Action 1 - Extract folder tree from OS
+            //Action 1 - Extract folder tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat)
             ExtractFoldersTree(collectionOriginType);
 
-            //Action 2 - Transform text file from previous step to csv file
+            //Action 2 - Transform text file from previous step to csv file (output '*.csv')
             TransformFlatFileToStandardCsv(collectionOriginType);
 
-            //Action 3 - Validate Path rules (input file must have only Folders)
+            //Action 3 - Validate Path rules (input file must have only Folders) (input '*.txt', output '*_ERROR.csv'.
             ValidateCollectionOriginType(collectionOriginType);
 
 

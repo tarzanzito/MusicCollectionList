@@ -31,17 +31,21 @@ namespace MusicCollectionActions
             string fullFileNameIn;
             string fullFileNameOut;
 
-            if (collectionOriginType == CollectionOriginType.Loss)
+            //output files
+            switch (collectionOriginType)
             {
-                rootFolder = Constants.FolderRootCollectionLoss;
-                fullFileNameIn = Path.Join(rootFolder, Constants.TreeTextFileNameCollectionLoss); 
-                fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLoss);
-            }
-            else
-            {
-                rootFolder = Constants.FolderRootCollectionLossLess;
-                fullFileNameIn = Path.Join(rootFolder, Constants.TreeTextFileNameCollectionLossLess);
-                fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLossLess);
+                case CollectionOriginType.Lossless:
+                    rootFolder = Constants.FolderRootCollectionLossLess;
+                    fullFileNameIn = Path.Join(rootFolder, Constants.TreeTextFileNameCollectionLossLess);
+                    fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLossLess);
+                    break;
+                case CollectionOriginType.Loss:
+                    rootFolder = Constants.FolderRootCollectionLoss;
+                    fullFileNameIn = Path.Join(rootFolder, Constants.TreeTextFileNameCollectionLoss);
+                    fullFileNameOut = Path.Join(rootFolder, Constants.TreeCsvFileNameCollectionLoss);
+                    break;
+                default:
+                    throw new Exception("CollectionOriginType error in 'FilesTransformer.FlatToCSV')");
             }
 
             Log.Information($"rootFolder={rootFolder}");

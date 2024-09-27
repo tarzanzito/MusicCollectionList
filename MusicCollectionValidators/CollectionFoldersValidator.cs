@@ -14,11 +14,17 @@ namespace MusicCollectionValidators
         //constructor
         public CollectionFoldersValidator(CollectionOriginType collectionOriginType)
         {
-            if (collectionOriginType == CollectionOriginType.Loss)
-                _mediaFormatTags = Constants.MEDIA_FORMAT_TAG_LOSS;
-
-            if (collectionOriginType == CollectionOriginType.Lossless)
-                _mediaFormatTags = Constants.MEDIA_FORMAT_TAG_LOSSLESS;
+            switch(collectionOriginType)
+            {
+                case CollectionOriginType.Lossless:
+                    _mediaFormatTags = Constants.MEDIA_FORMAT_TAG_LOSSLESS;
+                    break;
+                case CollectionOriginType.Loss:
+                    _mediaFormatTags = Constants.MEDIA_FORMAT_TAG_LOSS;
+                    break;
+                default:
+                    throw new Exception("CollectionOriginType error in 'CollectionFoldersValidator.Constructor')");
+            }
         }
 
         public CollectionFoldersValidatorResult ValidateFolder(string path, string letter)
