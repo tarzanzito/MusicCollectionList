@@ -11,6 +11,8 @@ using MusicCollectionActions;
 using MusicCollectionValidators;
 using MusicCollectionLinux;
 
+//ADD PACKAGES
+
 //via dotnet command
 //dotnet add package Microsoft.PowerShell.SDK
 //dotnet add package Serilog.Sinks.File
@@ -29,36 +31,57 @@ namespace MusicCollectionListApp
 
         public static int Main(string[] args)
         {
-            StartLogger();
+            try
+            {
+                StartLogger();
+            }
+            catch (Exception ex1)
+            {
+                Console.WriteLine($"Error in StartLogger': {ex1.Message}");
+                return 2;
+            }
 
-            Log.Information("App Started...");
+            try
+            {
+                Log.Information("App Started...");
 
 
-            //CHOOSE here the input Collection
-            CollectionOriginType collectionOriginType = CollectionOriginType.Lossless;
+                //CHOOSE here the input Collection
+                CollectionOriginType collectionOriginType = CollectionOriginType.Lossless;
 
-            //Action 1 - Extract ONLY folders tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat)
-            ExtractInfoFromOS(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
+                //Action 1 - Extract ONLY folders tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat.likw linux)
+                ExtractInfoFromOS(collectionOriginType, FileSystemContextFilter.DirectoriesOnly);
 
-            //Action 2 - Transform text file from previous step to csv file (output '*.csv')
-            TransformFlatFileToStandardCsv(collectionOriginType, false, true);
+                //Action 2 - Transform text file from previous step to csv file (output '*.csv')
+                TransformFlatFileToStandardCsv(collectionOriginType, false, true);
 
-            //Action 3 - Validate Path rules (input file must have only Folders) (input '*.txt', output '*_ERROR.csv'.
-            ValidateCollectionOriginType(collectionOriginType);
+                //Action 3 - Validate Path rules (input file must have only Folders) (input '*.txt', output '*_ERROR.csv'.
+                ValidateCollectionOriginType(collectionOriginType);
 
-            //////////////
+                //////////////
 
-            //Action 4 - Extract ONLY files tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat)
-            RenameFiles(collectionOriginType, "D"); 
-            ExtractInfoFromOS(collectionOriginType, FileSystemContextFilter.FilesOnly);
-            TransformFlatFileToStandardCsv(collectionOriginType, false, true);
+                //save last files
+                RenameFiles(collectionOriginType, "D");
 
-            Log.Information("Finished...");
+                //Action 4 - Extract ONLY files tree from OS  (output '*.tmp' pure dir, '*.txt' LinearFormat-like linux)
+                ExtractInfoFromOS(collectionOriginType, FileSystemContextFilter.FilesOnly);
+                TransformFlatFileToStandardCsv(collectionOriginType, false, true);
 
-            Log.Information("Enter ...");
-            Console.ReadKey();
 
-            return 0;
+                Log.Information("Finished...");
+
+#if DEBUG
+                Log.Information("Enter ...");
+                Console.ReadKey();
+#endif
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error:{ex.Message}");
+                Log.Error("Error:{ex.Message}");
+                return 1;
+            }
         }
 
 
@@ -66,11 +89,9 @@ namespace MusicCollectionListApp
         {
             Startwatch("ExtractInfoFromOS");
 
-            //FileSystemContextFilter fileSystemContextFilter = FileSystemContextFilter.DirectoriesOnly;
-
             bool result;
 
-            //-------------------------------------------------------------
+            //=============================================================
             //Option 1 - Extractor Files and Folder via (CMD / DOS command)
             //
             //TOP 1 - BEST HIGH PERFORMANCE
@@ -78,7 +99,8 @@ namespace MusicCollectionListApp
             var msDosShellHelper = new MsDosShellHelper();
             result = msDosShellHelper.TreeProcess(collectionOriginType, fileSystemContextFilter, applyExtensionsFilter, true);
 
-            //-----------------------------------------------------
+
+            //======================================================
             //Option 2 - Extractor Files and Folder via (PowerShell)
             //
             //TOP 2 - MIDDLE PERFORMANCE
@@ -95,11 +117,11 @@ namespace MusicCollectionListApp
             //powerShellHelper.TreeProcessUsingScriptString(collectionOriginType, fileSystemContextFilter, true, true);
 
 
-            //-----------------------------------------------------------------------------------------------
+            //=============================================================================================
             //Option 3 - Extractor Files and Folder via (C#) , Directory.GetDirectories, Directory.GetFiles
             //
             //TOP 3 - LOW PERFORMANCE
-            //-----------------------------------------------------------------------------------------------
+            //---------------------------------------------------------------------------------------------
 
             //var systemIOShellHelper = new SystemIOShellHelper();
             //systemIOShellHelper.TreeProcess(collectionOriginType, fileSystemContextFilter, true);
@@ -139,8 +161,7 @@ namespace MusicCollectionListApp
         {
             Startwatch("ValidateCollectionOriginType");
 
-            //Note: input file must have only Folders
-            // FileSystemContextFilter.DirectoriesOnly
+            //NOTE: input file must have only Folders. USE FileSystemContextFilter.DirectoriesOnly
             //Validate folders formats
             //  Artist : ArtistName {countryName}
             //  Album  : ArtistName {year} [AlbumName] @FLAC (or @MP3) 
