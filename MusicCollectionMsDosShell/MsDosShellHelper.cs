@@ -330,7 +330,7 @@ namespace MusicCollectionMsDos
                         string newLine = $"{baseDir}{Path.DirectorySeparatorChar}{item}";
 
                         if (isFolder)
-                            line += dirMark;
+                            newLine += dirMark;
                         //if (isFolder)
                         //     _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
                         // else
