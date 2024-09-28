@@ -197,7 +197,7 @@ namespace MusicCollectionMsDos
             {
                 if (_streamWriter != null)
                 {
-                    _streamWriter.Flush();
+                    //_streamWriter.Flush();
                     _streamWriter.Close();
                 }
 
@@ -354,7 +354,7 @@ namespace MusicCollectionMsDos
             finally
             {
                 _streamReader?.Close();
-                _streamWriter?.Flush();
+                //_streamWriter?.Flush();
                 _streamWriter?.Close();
 
                 Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");

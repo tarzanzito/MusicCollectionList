@@ -56,7 +56,7 @@ namespace MusicCollectionValidators
             {
                 _reader?.Close();
 
-                _writer?.Flush();
+                //_writer?.Flush();
                 _writer?.Close();
             }
 

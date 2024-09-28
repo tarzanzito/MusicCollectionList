@@ -86,7 +86,7 @@ namespace MusicCollectionSystemIO
             {
                 if (_streamWriter != null)
                 {
-                    _streamWriter.Flush();
+                    //_streamWriter.Flush();
                     _streamWriter.Close();
                 }
 

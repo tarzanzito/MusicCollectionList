@@ -159,7 +159,7 @@ namespace MusicCollectionLinux
             {
                 if (_streamWriter != null)
                 {
-                    _streamWriter.Flush();
+                    //_streamWriter.Flush();
                     _streamWriter.Close();
                 }
 
@@ -317,7 +317,7 @@ namespace MusicCollectionLinux
                 }
                 if (_streamWriter != null)
                 {
-                    _streamWriter.Flush();
+                    //_streamWriter.Flush();
                     _streamWriter.Close();
                 }
             }
