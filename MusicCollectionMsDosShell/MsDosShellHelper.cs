@@ -29,7 +29,7 @@ namespace MusicCollectionMsDos
         /// Note: /B output do not show difference between file and folder
         ///       so /B is no longer used in these methods  
         ///       
-        /// This method add '\' at end of any folder.
+        /// Like linux 'ls' This method add '\' at end of any folder.
         /// 
         /// </summary>
         /// <param name="collectionOriginType"></param>
@@ -95,14 +95,15 @@ namespace MusicCollectionMsDos
 
                 switch (contextFilter)
                 {
+                    //chcp 65001>nul  do not send output message. note: is 'nul' not 'null'
                     case FileSystemContextFilter.All:
-                        msDosCommand = $"chcp 65001 & dir /S {rootPath}";
+                        msDosCommand = $"chcp 65001>nul & dir /S {rootPath}";
                         break;
                     case FileSystemContextFilter.DirectoriesOnly:
-                        msDosCommand = $"chcp 65001 & dir /S /A:D {rootPath}";
+                        msDosCommand = $"chcp 65001>nul & dir /S /A:D {rootPath}";
                         break;
                     case FileSystemContextFilter.FilesOnly:
-                        msDosCommand = $"chcp 65001 & dir /S /A:-D {rootPath}";
+                        msDosCommand = $"chcp 65001>nul & dir /S /A:-D {rootPath}";
                         break;
                 }
 
