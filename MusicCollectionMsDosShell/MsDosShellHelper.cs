@@ -200,6 +200,7 @@ namespace MusicCollectionMsDos
                 {
                     //_streamWriter.Flush();
                     _streamWriter.Close();
+                    _streamWriter?.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
@@ -229,10 +230,19 @@ namespace MusicCollectionMsDos
         }
 
         /// <summary>
-        /// set output like linear format ("dir /B") but adding char '\' at the end of folder entries
+        /// set output like linear format (like "dir /B") but adding char '\' at the end of folder entries
         /// lines example: 
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\   "folder"
+        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\   "folder" ('\' at end)
         /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3  "file"
+        /// 
+        /// linux relation command
+        /// ls -l -h -a -p -R Path
+        //
+        // -l  -- list with long format - show permissions
+        // -h  -- list long format with readable file size
+        // -a  -- list all files including hidden file starting with '.'
+        // -p  -- indicator-style=slash - append '/' indicator to directories
+        // -R  -- list recursively directory tree
         /// </summary>
         private void ChangeOutputToLinearFormat()
         {
@@ -264,7 +274,6 @@ namespace MusicCollectionMsDos
                 bool isValid = false;
                 string baseDir = "";
                 string item;
-                char dirMark = Path.DirectorySeparatorChar;
 
                 while ((line = _streamReader.ReadLine()) != null)
                 {
@@ -331,11 +340,7 @@ namespace MusicCollectionMsDos
                         string newLine = $"{baseDir}{Path.DirectorySeparatorChar}{item}";
 
                         if (isFolder)
-                            newLine += dirMark;
-                        //if (isFolder)
-                        //     _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}{dirMark}");
-                        // else
-                        //     _streamWriter.WriteLine($"{baseDir}{Path.DirectorySeparatorChar}{item}");
+                            newLine += Path.DirectorySeparatorChar;
 
                         _streamWriter.WriteLine(newLine);
                         _streamWriter.Flush();
@@ -349,6 +354,7 @@ namespace MusicCollectionMsDos
             {
                 if (line != null)
                     Log.Error($"Line:{line}");
+
                 Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
             }
@@ -357,6 +363,7 @@ namespace MusicCollectionMsDos
                 _streamReader?.Close();
                 //_streamWriter?.Flush();
                 _streamWriter?.Close();
+                _streamWriter?.Dispose();
 
                 Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 

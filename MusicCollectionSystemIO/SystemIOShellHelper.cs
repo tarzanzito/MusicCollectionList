@@ -9,9 +9,6 @@ namespace MusicCollectionSystemIO
     public class SystemIOShellHelper
     {
         private StreamWriter? _streamWriter;
-        private FileSystemContextFilter _contextFilter;
-        private string _extensionFilter = string.Empty;
-        private bool _applyExtensionsFilter;
 
         /// <summary>
         /// generate text file with system tree with files and folders.
@@ -28,8 +25,7 @@ namespace MusicCollectionSystemIO
         /// <param name="applyExtensionsFilter"></param>
         public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter)
         {
-            _contextFilter = contextFilter;
-            _applyExtensionsFilter = applyExtensionsFilter;
+            string extensionFilter = string.Empty;
 
             Log.Information("'MusicCollectionSystemIO.TreeProcess' Started...");
 
@@ -47,20 +43,18 @@ namespace MusicCollectionSystemIO
                     rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
                     fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
                     if (applyExtensionsFilter)
-                        _extensionFilter = Constants.FileExtensionsFilterLoss;
+                        extensionFilter = Constants.FileExtensionsFilterLoss;
                 }
                 else
                 {
                     rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
                     fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
                     if (applyExtensionsFilter)
-                        _extensionFilter = Constants.FileExtensionsFilterLossLess;
+                        extensionFilter = Constants.FileExtensionsFilterLossLess;
                 }
 
-                _extensionFilter = _extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();
-
                 if (applyExtensionsFilter)
-                    _applyExtensionsFilter = _extensionFilter.Length > 0;
+                    extensionFilter = extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();
 
                 if (!Directory.Exists(rootPath))
                 {
@@ -72,11 +66,11 @@ namespace MusicCollectionSystemIO
                 Log.Information($"Output File:[{fullFileNameOut}]");
                 Log.Information($"Context Filter:[{contextFilter}]");
                 Log.Information($"Apply Extensions Filter:[{applyExtensionsFilter}]");
-                Log.Information($"Extensions Filter:[{_extensionFilter}]");
+                Log.Information($"Extensions Filter:[{extensionFilter}]");
 
                 _streamWriter = new StreamWriter(fullFileNameOut, false, Constants.StreamsEncoding);
 
-                LoadDirectoryInfo(rootPath);
+                LoadDirectoryInfo(rootPath, contextFilter, extensionFilter);
             }
             catch (Exception ex)
             {
@@ -88,6 +82,7 @@ namespace MusicCollectionSystemIO
                 {
                     //_streamWriter.Flush();
                     _streamWriter.Close();
+                    _streamWriter.Dispose();
                 }
 
                 Utils.Stopwatch(stopwatch, "SystemIOShellHelper", "TreeProcess");
@@ -96,16 +91,18 @@ namespace MusicCollectionSystemIO
             }
         }
 
-        private void LoadDirectoryInfo(string directory)
+        private void LoadDirectoryInfo(string directory, FileSystemContextFilter contextFilter, string extensionFilter)
         {
             if (_streamWriter == null)
                 throw new Exception("_streamWriter is null");
+
+            bool applyExtensionsFilter = extensionFilter.Length > 0;
 
             // Get all directories  
             string[] directoriesEntry = Directory.GetDirectories(directory);
 
             //process directories
-            if ((_contextFilter == FileSystemContextFilter.All) || (_contextFilter == FileSystemContextFilter.DirectoriesOnly))
+            if ((contextFilter == FileSystemContextFilter.All) || (contextFilter == FileSystemContextFilter.DirectoriesOnly))
             {
                 foreach (string item in directoriesEntry)
                 {
@@ -116,7 +113,7 @@ namespace MusicCollectionSystemIO
             }
 
             //process files
-            if ((_contextFilter == FileSystemContextFilter.All) || (_contextFilter == FileSystemContextFilter.FilesOnly))
+            if ((contextFilter == FileSystemContextFilter.All) || (contextFilter == FileSystemContextFilter.FilesOnly))
             {
                 // Get all files
                 string[] filesEntries = Directory.GetFiles(directory);
@@ -125,10 +122,10 @@ namespace MusicCollectionSystemIO
                 
                 foreach (string item in filesEntries)
                 {
-                    if (_applyExtensionsFilter)
+                    if (applyExtensionsFilter)
                     {
                         string extension = Path.GetExtension(item).ToUpper().Trim();
-                        isValid = _extensionFilter.Contains(extension);
+                        isValid = extensionFilter.Contains(extension);
                     }
 
                     if (isValid)
@@ -141,7 +138,7 @@ namespace MusicCollectionSystemIO
 
             //process next tree directories
             foreach (string dir in directoriesEntry)
-                LoadDirectoryInfo(dir);
+                LoadDirectoryInfo(dir, contextFilter, extensionFilter);
         }
     }
 }

@@ -208,8 +208,9 @@ namespace MusicCollectionPowerShell
                     powerShell?.Stop();
                     powerShell?.Dispose();
                 }
-                    _writer?.Flush();
+                    //_writer?.Flush();
                     _writer?.Close();
+                    _writer?.Dispose();
             }
 
             Log.Information("'PowerShellHelper.TreeProcessUsingCommand' - Finish...");
@@ -503,9 +504,11 @@ namespace MusicCollectionPowerShell
             finally
             {
                 _reader?.Close();
+                _reader?.Dispose();
 
-                _writer?.Flush();
+                //_writer?.Flush();
                 _writer?.Close();
+                _writer?.Dispose();
 
                 Utils.Stopwatch(stopwatch, "PowerShellHelper", "ChangeOutputToLinearFormat");
 
