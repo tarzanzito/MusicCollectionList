@@ -117,7 +117,7 @@ namespace MusicCollectionMsDos
                 resultOk = MsDosProcess(msDosCommand);
 
                 if (resultOk && setToLinearOutputFormat)
-                    ChangeOutputToLinearFormat();
+                    ChangeToCsvLinearFormat();
             }
             catch (Exception ex)
             {
@@ -244,24 +244,33 @@ namespace MusicCollectionMsDos
         // -p  -- indicator-style=slash - append '/' indicator to directories
         // -R  -- list recursively directory tree
         /// </summary>
-        private void ChangeOutputToLinearFormat()
+        private void ChangeToCsvLinearFormat()
         {
             Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Started...");
-
-            if (!File.Exists(_fullFileNameTemp))
-            {
-                Log.Error($"Folder Root not exists=[{_fullFileNameTemp}");
-                return;
-            }
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 
-            int count = 0;
+            _streamReader = null;
+            _streamWriter = null;
+
             string? line = null;
+            int countFolders = 0;
+            int countFiles = 0;
 
             try
             {
+                if (!File.Exists(_fullFileNameTemp))
+                    throw new Exception($"InputFile:'{_fullFileNameTemp}' not found.");
+
+                if (!CanCreateFile(_fullFileNameOut))
+                    throw new Exception($"OutputFile:'{_fullFileNameOut}' cannot be created.");
+
+                bool isFolder = false;
+                bool isValid = true;
+                string baseDir = "";
+                string item;
+                
                 //using (StreamReader reader = new StreamReader(fileName)) //C# 8
                 //{
                 //}
@@ -269,11 +278,6 @@ namespace MusicCollectionMsDos
 
                 _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
                 _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
-
-                bool isFolder = false;
-                bool isValid = false;
-                string baseDir = "";
-                string item;
 
                 while ((line = _streamReader.ReadLine()) != null)
                 {
@@ -299,8 +303,6 @@ namespace MusicCollectionMsDos
                     if (isFolder && (item == ".") || (item == ".."))
                         continue;
 
-                    //
-
                     //Verify Context Filter
                     if (isFolder)
                     {
@@ -315,11 +317,7 @@ namespace MusicCollectionMsDos
 
                     //Apply Extensions Filter
                     if (isFolder)
-                    {
-                        //append 'DirectorySeparatorChar' at end (like linux)
-                        //dirMark = Path.DirectorySeparatorChar;
                         isValid = true;
-                    }
                     else
                     {
                         //verify Extensions Filter
@@ -330,8 +328,6 @@ namespace MusicCollectionMsDos
                         }
                         else
                             isValid = true;
-
-                        //dirMark = ""; // '\0';
                     }
 
                     //write
@@ -345,18 +341,24 @@ namespace MusicCollectionMsDos
                         _streamWriter.WriteLine(newLine);
                         _streamWriter.Flush();
                     }
+
+                    //counters
+                    if (isFolder)
+                        countFolders++;
+                    else
+                        countFiles++;
                 }
 
-                Log.Information(count.ToString());
+                Log.Information($"Total Folders:{countFolders}");
+                Log.Information($"Total Files  :{countFiles}");
+                Log.Information($"Total        :{countFolders + countFiles}");
 
             }
             catch (Exception ex)
             {
+                Log.Error($"{ex.Message}");
                 if (line != null)
                     Log.Error($"Line:{line}");
-
-                Log.Error($"Outout:{_fullFileNameOut}");
-                Log.Error($"Message Error:{ex.Message}");
             }
             finally
             {
@@ -369,6 +371,23 @@ namespace MusicCollectionMsDos
 
                 Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Finished...");
             }
+        }
+
+        private bool CanCreateFile(string fileName)
+        {
+            bool canCreate = false;
+
+            try
+            {
+                using (File.Create(fileName)) { };
+                File.Delete(fileName);
+                canCreate = true;
+            }
+            catch
+            {
+            }
+
+            return canCreate;
         }
 
         #region comments
