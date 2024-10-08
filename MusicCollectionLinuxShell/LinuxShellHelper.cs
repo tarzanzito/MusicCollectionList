@@ -1,6 +1,7 @@
 ﻿using MusicCollectionContext;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -17,6 +18,8 @@ namespace MusicCollectionLinux
     public class LinuxShellHelper
     {
         private StreamWriter? _streamWriter;
+        bool _applyExtensionsFilter = false;
+        string _extensionFilter = string.Empty;
 
         public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
@@ -61,7 +64,20 @@ namespace MusicCollectionLinux
 
                 Log.Information($"Output=[{fullFileNameOut}");
 
-                string bashCommand = $"ls -l -h -a -p -R {rootPath}";
+                string bashCommand = string.Empty;
+                switch (contextFilter)
+                {
+                    case FileSystemContextFilter.All:
+                        bashCommand = $"ls -l -h -a -p -R {rootPath}";
+                        break;
+                    case FileSystemContextFilter.DirectoriesOnly:
+                        bashCommand = $"ls -l -h -a -p -R -d {rootPath}";
+                        break;
+                    case FileSystemContextFilter.FilesOnly:
+                        bashCommand = $"ls -l -h -a -p -R {rootPath}";
+                        break;
+                }
+
                 //-p -- put char '/' at the end of each folder, but this option seems not to be necessary
 
                 //process 
@@ -94,8 +110,42 @@ namespace MusicCollectionLinux
             if (_streamWriter == null)
                 return;
 
-            _streamWriter.WriteLine(e.Data);
-            _streamWriter.Flush();
+            if (e.Data == null)
+                return;
+
+            bool isValid = true;
+            bool isFolder = e.Data.StartsWith("d");
+
+            //if (isFolder)
+            //{
+            //    if (contextFilter == FileSystemContextFilter.FilesOnly)
+            //        continue;
+            //}
+            //else
+            //{
+            //    if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
+            //        continue;
+            //}
+
+            ////Apply Extensions Filter
+            if (!isFolder)
+            {
+                //verify Extensions Filter
+                if (_applyExtensionsFilter)
+                {
+                    string extension = Path.GetExtension(e.Data).ToUpper().Trim();
+                    isValid = _extensionFilter.Contains(extension);
+                }
+                else
+                    isValid = true;
+            }
+
+            if (isValid)
+            {
+                _streamWriter.WriteLine(e.Data);
+                _streamWriter.Flush();
+            }
+
         }
 
         private bool LinuxBashProcess(string bashCommand, string fullFileNameOut)
@@ -182,22 +232,18 @@ namespace MusicCollectionLinux
         /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3
         /// </summary>
         /// <param name="contextFilter"></param>
-        private void ChangeOutputToLinearFormat(string _fullFileNameTemp, string _fullFileNameOut, string initialPath = "")
+        private void ChangeOutputToLinearFormat(string inputFileName, string outputFileName, string prefixPath = "")
         {
-            Log.Information("LinuxShellHelper.ChangeOutputToLinearFormat Started");
+            //-rw-rw-r-- 1 root root 18 May 28 19:48 text_file_1.txt
+
+            Log.Information("ChangeOutputToLinearFormat Started");
+
+            Log.Information($"InputFile={inputFileName}");
+            Log.Information($"OutputFile={outputFileName}");
+            Log.Information($"PrefixPath={prefixPath}");
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "LinuxShellHelper", "ChangeOutputToLinearFormat");
-
-            //_fullFileNameTemp = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless.txt";
-            //_fullFileNameOut = @"E:\_MEGA_DRIVE\__GitHub\__Synchronized\C_Sharp\MusicCollectionList\MusicCollectionLinuxShell\putty_lossless_new.txt";
-            //_applyExtensionsFilter = false;
-
-            if (!File.Exists(_fullFileNameTemp))
-            {
-                Log.Error($"Folder Root not exists=[{_fullFileNameTemp}");
-                return;
-            }
 
             StreamReader? streamReader = null;
             StreamWriter? streamWriter = null;
@@ -206,12 +252,18 @@ namespace MusicCollectionLinux
 
             try
             {
-                streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
-                streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
+                if (!File.Exists(inputFileName))
+                    throw new Exception($"InputFile:'{inputFileName}' not found.");
+
+                if (!CanCreateFile(outputFileName))
+                    throw new Exception($"OutputFile:'{outputFileName}' cannot be created.");
+
+                streamReader = new StreamReader(inputFileName, Constants.StreamsEncoding);
+                streamWriter = new StreamWriter(outputFileName, false, Constants.StreamsEncoding);
 
                 bool isFolder = false;
                 bool hasEndFolderChar = false;
-                bool useInitialPath = (initialPath.Length > 0);
+                bool useInitialPath = (prefixPath.Length > 0);
                 string basePath = "";
                 string rootPath = "";
                 string member = "";
@@ -220,10 +272,10 @@ namespace MusicCollectionLinux
                 //get rootPath without last '/'
                 if (useInitialPath)
                 {
-                    if (initialPath.EndsWith("'/"))
-                        rootPath = initialPath.Substring(0, initialPath.Length - 1);
+                    if (prefixPath.EndsWith("'/"))
+                        rootPath = prefixPath.Substring(0, prefixPath.Length - 1);
                     else
-                        rootPath = initialPath;
+                        rootPath = prefixPath;
                 }
 
                 while ((line = streamReader.ReadLine()) != null)
@@ -281,11 +333,13 @@ namespace MusicCollectionLinux
             }
             catch (Exception ex)
             {
+                Log.Error($"Message Error:{ex.Message}");
+
+                Log.Error($"InputFileName:{inputFileName}");
+                Log.Error($"OutoutFileName:{outputFileName}");
+
                 if (line != null)
                     Log.Error($"Line:{line}");
-
-                Log.Error($"Outout:{_fullFileNameOut}");
-                Log.Error($"Message Error:{ex.Message}");
             }
             finally
             {
@@ -301,6 +355,22 @@ namespace MusicCollectionLinux
                     streamWriter.Dispose();
                 }
             }
+        }
+        private bool CanCreateFile(string fileName)
+        {
+            bool canCreate = false;
+
+            try
+            {
+                using (File.Create(fileName)) { };
+                File.Delete(fileName);
+                canCreate = true;
+            }
+            catch
+            {
+            }
+
+            return canCreate;
         }
 
         private LinuxLineInfo GetLineInfo(string line)

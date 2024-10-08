@@ -10,11 +10,7 @@ namespace MusicCollectionMsDos
 {
     public class MsDosShellHelper
     {
-        private StreamReader? _streamReader;
         private StreamWriter? _streamWriter;
-        private string _fullFileNameTemp = string.Empty;
-        private string _fullFileNameOut = string.Empty;
-        private FileSystemContextFilter _contextFilter;
         private string _extensionFilter = string.Empty;
         private bool _applyExtensionsFilter;
 
@@ -32,20 +28,17 @@ namespace MusicCollectionMsDos
         /// Like linux 'ls' This method add '\' at end of any folder.
         /// 
         /// </summary>
-        /// <param name="collectionOriginType"></param>
-        /// <param name="contextFilter"></param>
-        /// <param name="applyExtensionsFilter"></param>
-        /// <param name="setToLinearOutputFormat"></param>
-        /// 
         public bool TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
-            Log.Information("'MusicCollectionMsDos.TreeProcess' - Started...");
+            Log.Information("'TreeProcess' - Started...");
             
             bool resultOk = false;
+            string outputFileName = string.Empty;
+            string tempFileName = string.Empty;
 
             try
             {
-                _contextFilter = contextFilter;
+                //string extensionFilter = string.Empty;
                 _applyExtensionsFilter = applyExtensionsFilter;
 
                 string rootPath;
@@ -55,15 +48,15 @@ namespace MusicCollectionMsDos
                 {
                     case CollectionOriginType.Lossless:
                         rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLossLess);
-                        _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
-                        _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
+                        outputFileName = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLossLess);
+                        tempFileName = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLossLess);
                         if (applyExtensionsFilter)
                             _extensionFilter = Constants.FileExtensionsFilterLossLess;
                         break;
                     case CollectionOriginType.Loss:
                         rootPath = Utils.AppendDirectorySeparator(Constants.FolderRootCollectionLoss);
-                        _fullFileNameOut = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
-                        _fullFileNameTemp = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
+                        outputFileName = System.IO.Path.Join(rootPath, Constants.TreeTextFileNameCollectionLoss);
+                        tempFileName = System.IO.Path.Join(rootPath, Constants.TreeTempFileNameCollectionLoss);
                         if (applyExtensionsFilter)
                             _extensionFilter = Constants.FileExtensionsFilterLoss;
 
@@ -74,8 +67,8 @@ namespace MusicCollectionMsDos
 
                 _extensionFilter = _extensionFilter.Replace("*", "").Replace(" ", "").ToUpper().Trim();
 
-                if (applyExtensionsFilter)
-                    _applyExtensionsFilter = _extensionFilter.Length > 0;
+                //if (applyExtensionsFilter)
+                //    _applyExtensionsFilter = _extensionFilter.Length > 0;
 
                 if (!Directory.Exists(rootPath))
                 {
@@ -84,7 +77,7 @@ namespace MusicCollectionMsDos
                 }
 
                 if (!setToLinearOutputFormat)
-                    _fullFileNameTemp = _fullFileNameOut;
+                    tempFileName = outputFileName;
 
                 //make MS-DOS command
 
@@ -107,34 +100,32 @@ namespace MusicCollectionMsDos
                         break;
                 }
 
-                Log.Information($"Output File:[{_fullFileNameOut}]");
-                Log.Information($"Context Filter:[{_contextFilter}]");
-                Log.Information($"Apply Extensions Filter:[{_applyExtensionsFilter}]");
+                Log.Information($"Output File:[{outputFileName}]");
+                Log.Information($"Context Filter:[{contextFilter}]");
+                Log.Information($"Apply Extensions Filter:[{applyExtensionsFilter}]");
                 Log.Information($"Extensions Filter:[{_extensionFilter}]");
                 Log.Information($"MS-DOS Command:[{msDosCommand}]");
 
                 //process 
-                resultOk = MsDosProcess(msDosCommand);
+                resultOk = MsDosProcess(msDosCommand, tempFileName);
 
                 if (resultOk && setToLinearOutputFormat)
-                    ChangeToCsvLinearFormat();
+                    ChangeToCsvLinearFormat(tempFileName, outputFileName);
             }
             catch (Exception ex)
             {
                 Log.Error($"ERROR EXCEPTION: {ex.Message}");
                 resultOk = false;
             }
-            finally
-            {
-                Log.Information("'MusicCollectionMsDos.TreeProcess' - Finished...");
-            }
+
+            Log.Information("'TreeProcess' - Finished...");
 
             return resultOk;
         }
 
-        private bool MsDosProcess(string msDosCommand)
+        private bool MsDosProcess(string msDosCommand, string outputFileName)
         {
-            Log.Information("'MusicCollectionMsDos.MsDosProcess' - Started...");
+            Log.Information("'MsDosProcess' - Started...");
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
@@ -144,7 +135,7 @@ namespace MusicCollectionMsDos
             try
             {
                 //output
-                _streamWriter = new StreamWriter(_fullFileNameTemp, false, Constants.StreamsEncoding);
+                _streamWriter = new StreamWriter(outputFileName, false, Constants.StreamsEncoding);
 
                 //Process Info
                 var startInfo = new ProcessStartInfo();
@@ -189,9 +180,9 @@ namespace MusicCollectionMsDos
             }
             catch (Exception ex)
             {
-                Log.Error($"Command:{msDosCommand}");
-                Log.Error($"Outout:{_fullFileNameOut}");
                 Log.Error($"Message Error:{ex.Message}");
+                Log.Error($"Command:{msDosCommand}");
+                Log.Error($"Outout:{outputFileName}");
                 retValue = false;
             }
             finally
@@ -202,11 +193,11 @@ namespace MusicCollectionMsDos
                     _streamWriter.Close();
                     _streamWriter?.Dispose();
                 }
-
-                Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
-
-                Log.Information("'MusicCollectionMsDos.MsDosProcess' - Finished...");
             }
+
+            Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "TreeProcess");
+
+            Log.Information("'MusicCollectionMsDos.MsDosProcess' - Finished...");
 
             return retValue;
         }
@@ -225,34 +216,58 @@ namespace MusicCollectionMsDos
             if (_streamWriter == null)
                 return;
 
-            _streamWriter.WriteLine(e.Data);
-            _streamWriter.Flush();
+            if (e.Data == null)
+                return;
+
+            bool isValid = true;
+            bool isFolder = e.Data.Contains("<DIR>");
+
+            //if (isFolder)
+            //{
+            //    if (contextFilter == FileSystemContextFilter.FilesOnly)
+            //        continue;
+            //}
+            //else
+            //{
+            //    if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
+            //        continue;
+            //}
+
+            ////Apply Extensions Filter
+            if (!isFolder)
+            {
+                //verify Extensions Filter
+                if (_applyExtensionsFilter)
+                {
+                    string extension = Path.GetExtension(e.Data).ToUpper().Trim();
+                    isValid = _extensionFilter.Contains(extension);
+                }
+                else
+                    isValid = true;
+            }
+
+            if (isValid)
+            {
+                _streamWriter.WriteLine(e.Data);
+                _streamWriter.Flush();
+            }
         }
 
-        /// <summary>
-        /// set output like linear format (like "dir /B") but adding char '\' at the end of folder entries
-        /// lines example: 
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\   "folder" ('\' at end)
-        /// C:\_COLLECTION\C\Camel {United Kingdom}\Studio\Camel {1973} [Camel] @MP3\01. Slow Yourself Down.mp3  "file"
-        /// 
-        /// linux relation command
-        /// ls -l -h -a -p -R Path
-        //
-        // -l  -- list with long format - show permissions
-        // -h  -- list long format with readable file size
-        // -a  -- list all files including hidden file starting with '.'
-        // -p  -- indicator-style=slash - append '/' indicator to directories
-        // -R  -- list recursively directory tree
-        /// </summary>
-        private void ChangeToCsvLinearFormat()
+        //Typical input:
+        //  dir Path
+        //  dir /S Path
+        private void ChangeToCsvLinearFormat(string inputFileName, string outputFileName)
         {
-            Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Started...");
+            Log.Information("'ChangeToCsvLinearFormat' - Started...");
+
+            Log.Information($"InputFile={inputFileName}");
+            Log.Information($"OutputFile={outputFileName}");
 
             Stopwatch stopwatch = Utils.GetNewStopwatch();
             Utils.Startwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
 
-            _streamReader = null;
-            _streamWriter = null;
+            StreamReader? streamReader = null;
+            StreamWriter? streamWriter = null;
 
             string? line = null;
             int countFolders = 0;
@@ -260,26 +275,26 @@ namespace MusicCollectionMsDos
 
             try
             {
-                if (!File.Exists(_fullFileNameTemp))
-                    throw new Exception($"InputFile:'{_fullFileNameTemp}' not found.");
+                if (!File.Exists(inputFileName))
+                    throw new Exception($"InputFileName:'{inputFileName}' not found.");
 
-                if (!CanCreateFile(_fullFileNameOut))
-                    throw new Exception($"OutputFile:'{_fullFileNameOut}' cannot be created.");
+                if (!CanCreateFile(outputFileName))
+                    throw new Exception($"OutputFile:'{outputFileName}' cannot be created.");
 
                 bool isFolder = false;
-                bool isValid = true;
+                //bool isValid = true;
                 string baseDir = "";
                 string item;
-                
+
                 //using (StreamReader reader = new StreamReader(fileName)) //C# 8
                 //{
                 //}
                 //using var _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
 
-                _streamReader = new StreamReader(_fullFileNameTemp, Constants.StreamsEncoding);
-                _streamWriter = new StreamWriter(_fullFileNameOut, false, Constants.StreamsEncoding);
+                streamReader = new StreamReader(inputFileName, Constants.StreamsEncoding);
+                streamWriter = new StreamWriter(outputFileName, false, Constants.StreamsEncoding);
 
-                while ((line = _streamReader.ReadLine()) != null)
+                while ((line = streamReader.ReadLine()) != null)
                 {
                     if (line.Length < 14) //less than phrase " Directory of "
                         continue;
@@ -303,44 +318,14 @@ namespace MusicCollectionMsDos
                     if (isFolder && (item == ".") || (item == ".."))
                         continue;
 
-                    //Verify Context Filter
-                    if (isFolder)
-                    {
-                        if (_contextFilter == FileSystemContextFilter.FilesOnly)
-                            continue;
-                    }
-                    else
-                    {
-                        if (_contextFilter == FileSystemContextFilter.DirectoriesOnly)
-                            continue;
-                    }
-
-                    //Apply Extensions Filter
-                    if (isFolder)
-                        isValid = true;
-                    else
-                    {
-                        //verify Extensions Filter
-                        if (_applyExtensionsFilter)
-                        {
-                            string extension = Path.GetExtension(item).ToUpper().Trim();
-                            isValid = _extensionFilter.Contains(extension);
-                        }
-                        else
-                            isValid = true;
-                    }
-
                     //write
-                    if (isValid)
-                    {
-                        string newLine = $"{baseDir}{Path.DirectorySeparatorChar}{item}";
+                    string newLine = $"{baseDir}{Path.DirectorySeparatorChar}{item}";
 
-                        if (isFolder)
-                            newLine += Path.DirectorySeparatorChar;
+                    if (isFolder)
+                        newLine += Path.DirectorySeparatorChar;
 
-                        _streamWriter.WriteLine(newLine);
-                        _streamWriter.Flush();
-                    }
+                    streamWriter.WriteLine(newLine);
+                    streamWriter.Flush();
 
                     //counters
                     if (isFolder)
@@ -352,7 +337,6 @@ namespace MusicCollectionMsDos
                 Log.Information($"Total Folders:{countFolders}");
                 Log.Information($"Total Files  :{countFiles}");
                 Log.Information($"Total        :{countFolders + countFiles}");
-
             }
             catch (Exception ex)
             {
@@ -362,15 +346,21 @@ namespace MusicCollectionMsDos
             }
             finally
             {
-                _streamReader?.Close();
-                //_streamWriter?.Flush();
-                _streamWriter?.Close();
-                _streamWriter?.Dispose();
-
-                Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
-
-                Log.Information("'MusicCollectionMsDos.ChangeOutputToLinearFormat' - Finished...");
+                if (streamReader != null)
+                {
+                    streamReader.Close();
+                    streamReader.Dispose();
+                }
+                if (streamWriter != null)
+                {
+                    streamWriter.Close();
+                    streamWriter.Dispose();
+                }
             }
+
+            Utils.Stopwatch(stopwatch, "MusicCollectionMsDos", "ChangeOutputToLinearFormat");
+
+            Log.Information("'ChangeToCsvLinearFormatt' - Finished...");
         }
 
         private bool CanCreateFile(string fileName)
