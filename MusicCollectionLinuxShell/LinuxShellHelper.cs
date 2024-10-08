@@ -20,6 +20,7 @@ namespace MusicCollectionLinux
         private StreamWriter? _streamWriter;
         bool _applyExtensionsFilter = false;
         string _extensionFilter = string.Empty;
+        FileSystemContextFilter _contextFilter;
 
         public void TreeProcess(CollectionOriginType collectionOriginType, FileSystemContextFilter contextFilter, bool applyExtensionsFilter, bool setToLinearOutputFormat = true)
         {
@@ -32,8 +33,8 @@ namespace MusicCollectionLinux
 
             try
             {
-                //_contextFilter = contextFilter;
-                //_applyExtensionsFilter = applyExtensionsFilter;
+                _contextFilter = contextFilter;
+                _applyExtensionsFilter = applyExtensionsFilter;
 
                 //output files
                 if (collectionOriginType == CollectionOriginType.Loss)
@@ -71,10 +72,10 @@ namespace MusicCollectionLinux
                         bashCommand = $"ls -l -h -a -p -R {rootPath}";
                         break;
                     case FileSystemContextFilter.DirectoriesOnly:
-                        bashCommand = $"ls -l -h -a -p -R -d {rootPath}";
+                        bashCommand = $"ls -l -h -a -p -R -d {rootPath}"; //todo:
                         break;
                     case FileSystemContextFilter.FilesOnly:
-                        bashCommand = $"ls -l -h -a -p -R {rootPath}";
+                        bashCommand = $"ls -l -h -a -p -R {rootPath}"; //todo:
                         break;
                 }
 
@@ -116,16 +117,17 @@ namespace MusicCollectionLinux
             bool isValid = true;
             bool isFolder = e.Data.StartsWith("d");
 
-            //if (isFolder)
-            //{
-            //    if (contextFilter == FileSystemContextFilter.FilesOnly)
-            //        continue;
-            //}
-            //else
-            //{
-            //    if (contextFilter == FileSystemContextFilter.DirectoriesOnly)
-            //        continue;
-            //}
+            //todo: confirm
+            if (isFolder)
+            {
+                if (_contextFilter == FileSystemContextFilter.FilesOnly)
+                    return;
+            }
+            else
+            {
+                if (_contextFilter == FileSystemContextFilter.DirectoriesOnly)
+                    return;
+            }
 
             ////Apply Extensions Filter
             if (!isFolder)
@@ -145,7 +147,6 @@ namespace MusicCollectionLinux
                 _streamWriter.WriteLine(e.Data);
                 _streamWriter.Flush();
             }
-
         }
 
         private bool LinuxBashProcess(string bashCommand, string fullFileNameOut)
